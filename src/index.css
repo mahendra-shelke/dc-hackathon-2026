@@ -15,6 +15,93 @@
   --color-glass-border: rgb(71 85 105 / 0.5);
 }
 
+/* === Theme System via CSS Custom Properties === */
+
+:root,
+[data-theme="deep-navy"] {
+  --theme-bg: #020617;
+  --theme-bg-gradient: none;
+  --theme-sidebar: rgba(15, 23, 42, 0.8);
+  --theme-sidebar-border: rgba(71, 85, 105, 0.5);
+  --theme-card: rgba(30, 41, 59, 0.4);
+  --theme-card-hover: rgba(30, 41, 59, 0.6);
+  --theme-card-border: rgba(71, 85, 105, 0.5);
+  --theme-card-inner: rgba(30, 41, 59, 0.5);
+  --theme-text: #ffffff;
+  --theme-text-secondary: #94a3b8;
+  --theme-text-muted: #64748b;
+  --theme-text-dim: #475569;
+  --theme-input-bg: rgba(30, 41, 59, 0.6);
+  --theme-input-border: rgba(71, 85, 105, 0.5);
+  --theme-bar-bg: #334155;
+  --theme-modal-bg: #0f172a;
+  --theme-terminal-bg: rgba(15, 23, 42, 0.8);
+  color-scheme: dark;
+}
+
+[data-theme="charcoal-gradient"] {
+  --theme-bg: #0f172a;
+  --theme-bg-gradient: linear-gradient(160deg, #0f172a 0%, #1e1b4b 100%);
+  --theme-sidebar: rgba(15, 23, 42, 0.9);
+  --theme-sidebar-border: rgba(71, 85, 105, 0.4);
+  --theme-card: rgba(30, 41, 59, 0.5);
+  --theme-card-hover: rgba(30, 41, 59, 0.7);
+  --theme-card-border: rgba(71, 85, 105, 0.4);
+  --theme-card-inner: rgba(30, 41, 59, 0.5);
+  --theme-text: #ffffff;
+  --theme-text-secondary: #94a3b8;
+  --theme-text-muted: #64748b;
+  --theme-text-dim: #475569;
+  --theme-input-bg: rgba(30, 41, 59, 0.6);
+  --theme-input-border: rgba(71, 85, 105, 0.5);
+  --theme-bar-bg: #334155;
+  --theme-modal-bg: #0f172a;
+  --theme-terminal-bg: rgba(15, 23, 42, 0.8);
+  color-scheme: dark;
+}
+
+[data-theme="digicert-blue"] {
+  --theme-bg: #0b1120;
+  --theme-bg-gradient: none;
+  --theme-sidebar: rgba(11, 17, 32, 0.9);
+  --theme-sidebar-border: rgba(30, 58, 110, 0.4);
+  --theme-card: rgba(15, 25, 50, 0.5);
+  --theme-card-hover: rgba(15, 25, 50, 0.7);
+  --theme-card-border: rgba(30, 58, 110, 0.4);
+  --theme-card-inner: rgba(15, 25, 50, 0.5);
+  --theme-text: #ffffff;
+  --theme-text-secondary: #94a3b8;
+  --theme-text-muted: #64748b;
+  --theme-text-dim: #475569;
+  --theme-input-bg: rgba(15, 25, 50, 0.6);
+  --theme-input-border: rgba(30, 58, 110, 0.5);
+  --theme-bar-bg: #1e3a6e;
+  --theme-modal-bg: #0b1120;
+  --theme-terminal-bg: rgba(8, 12, 28, 0.8);
+  color-scheme: dark;
+}
+
+[data-theme="light"] {
+  --theme-bg: #f8fafc;
+  --theme-bg-gradient: none;
+  --theme-sidebar: #ffffff;
+  --theme-sidebar-border: #e2e8f0;
+  --theme-card: rgba(255, 255, 255, 0.8);
+  --theme-card-hover: rgba(255, 255, 255, 0.95);
+  --theme-card-border: #e2e8f0;
+  --theme-card-inner: rgba(241, 245, 249, 0.8);
+  --theme-text: #0f172a;
+  --theme-text-secondary: #475569;
+  --theme-text-muted: #64748b;
+  --theme-text-dim: #94a3b8;
+  --theme-input-bg: #f1f5f9;
+  --theme-input-border: #e2e8f0;
+  --theme-bar-bg: #e2e8f0;
+  --theme-modal-bg: #ffffff;
+  --theme-terminal-bg: #1e293b;
+  color-scheme: light;
+}
+
 ::-webkit-scrollbar {
   width: 6px;
 }
@@ -30,9 +117,56 @@
 }
 
 .glass {
-  background: rgb(30 41 59 / 0.4);
+  background: var(--theme-card);
   backdrop-filter: blur(12px);
-  border: 1px solid rgb(71 85 105 / 0.5);
+  border: 1px solid var(--theme-card-border);
+}
+
+/* === Light theme overrides for Tailwind utility classes === */
+/* Remap dark-theme text/bg colors so existing components work in light mode */
+
+[data-theme="light"] .text-white {
+  color: var(--theme-text) !important;
+}
+[data-theme="light"] .text-slate-300 {
+  color: #334155 !important;
+}
+[data-theme="light"] .text-slate-400 {
+  color: var(--theme-text-secondary) !important;
+}
+[data-theme="light"] .text-slate-500 {
+  color: var(--theme-text-muted) !important;
+}
+[data-theme="light"] .text-slate-600 {
+  color: var(--theme-text-dim) !important;
+}
+[data-theme="light"] .bg-slate-700 {
+  background-color: var(--theme-bar-bg) !important;
+}
+[data-theme="light"] .bg-slate-800\/40,
+[data-theme="light"] .bg-slate-800\/50,
+[data-theme="light"] .bg-slate-800\/60 {
+  background-color: var(--theme-card-inner) !important;
+}
+[data-theme="light"] .bg-slate-900\/80 {
+  background-color: var(--theme-terminal-bg) !important;
+}
+[data-theme="light"] .border-slate-700\/50,
+[data-theme="light"] .border-slate-700\/30 {
+  border-color: var(--theme-card-border) !important;
+}
+[data-theme="light"] .border-slate-800\/50 {
+  border-color: var(--theme-card-border) !important;
+}
+
+/* Light theme: modal overlay */
+[data-theme="light"] .bg-slate-900 {
+  background-color: var(--theme-modal-bg) !important;
+}
+
+/* Light theme: reduce glow intensity */
+[data-theme="light"] .glow-blue {
+  box-shadow: 0 0 12px rgb(12 109 253 / 0.15), 0 0 40px rgb(12 109 253 / 0.05) !important;
 }
 
 .glow-blue {

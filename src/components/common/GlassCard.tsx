@@ -17,10 +17,23 @@ export default function GlassCard({ children, className = '', hover = false, onC
       transition={{ duration: 0.4, delay, ease: 'easeOut' }}
       onClick={onClick}
       className={`
-        bg-slate-800/40 backdrop-blur-xl border border-slate-700/50 rounded-xl
-        ${hover ? 'cursor-pointer hover:bg-slate-800/60 hover:border-slate-600/50 transition-colors' : ''}
+        backdrop-blur-xl rounded-xl transition-colors duration-300
+        ${hover ? 'cursor-pointer' : ''}
         ${className}
       `}
+      style={{
+        backgroundColor: 'var(--theme-card)',
+        borderWidth: 1,
+        borderStyle: 'solid',
+        borderColor: 'var(--theme-card-border)',
+        ...(hover ? {} : {}),
+      }}
+      onMouseEnter={hover ? (e) => {
+        e.currentTarget.style.backgroundColor = 'var(--theme-card-hover)';
+      } : undefined}
+      onMouseLeave={hover ? (e) => {
+        e.currentTarget.style.backgroundColor = 'var(--theme-card)';
+      } : undefined}
     >
       {children}
     </motion.div>
