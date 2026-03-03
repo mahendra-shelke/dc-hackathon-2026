@@ -1,0 +1,168 @@
+import { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Check, AlertTriangle, X as XIcon, X } from 'lucide-react';
+import type { PqcAlgorithm, DeviceClass } from '../../types';
+import { pqcAlgorithms } from '../../data/algorithms';
+import { formatBytes } from '../../utils';
+
+const deviceClasses: { id: DeviceClass; label: string; description: string }[] = [
+  { id: 'constrained', label: 'Constrained', description: 'ARM Cortex-M, <256KB RAM' },
+  { id: 'mid-range', label: 'Mid-Range', description: 'ARM Cortex-A, 1-4MB RAM' },
+  { id: 'powerful', label: 'Powerful', description: 'Multi-core, 512MB+ RAM' },
+  { id: 'server-class', label: 'Server-Class', description: 'x86/ARM server, 4GB+ RAM' },
+];
+
+const SuitabilityIcon = ({ level }: { level: 'good' | 'moderate' | 'poor' }) => {
+  if (level === 'good') return <Check className="w-4 h-4 text-emerald-400" />;
+  if (level === 'moderate') return <AlertTriangle className="w-4 h-4 text-yellow-400" />;
+  return <XIcon className="w-4 h-4 text-red-400" />;
+};
+
+const suitBg = (level: string) => {
+  if (level === 'good') return 'bg-emerald-500/10 hover:bg-emerald-500/20';
+  if (level === 'moderate') return 'bg-yellow-500/10 hover:bg-yellow-500/20';
+  return 'bg-red-500/10 hover:bg-red-500/20';
+};
+
+export default function AlgorithmMatrix() {
+  const [selected, setSelected] = useState<PqcAlgorithm | null>(null);
+
+  return (
+    <div>
+      {/* Matrix grid */}
+      <div className="overflow-x-auto">
+        <table className="w-full border-collapse">
+          <thead>
+            <tr>
+              <th className="text-left text-xs text-slate-400 uppercase tracking-wider p-3 w-36">Device Class</th>
+              {pqcAlgorithms.map((alg) => (
+                <th
+                  key={alg.id}
+                  className="text-center text-xs text-slate-400 p-2 cursor-pointer hover:text-white transition-colors"
+                  onClick={() => setSelected(alg)}
+                >
+                  <div className="font-semibold">{alg.name}</div>
+                  <div className="text-[10px] text-slate-500 font-normal mt-0.5">
+                    {alg.type === 'kem' ? 'KEM' : 'SIG'} · L{alg.nistLevel}
+                  </div>
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {deviceClasses.map((dc, rowIdx) => (
+              <motion.tr
+                key={dc.id}
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: rowIdx * 0.1 }}
+                className="border-t border-slate-700/30"
+              >
+                <td className="p-3">
+                  <div className="text-sm font-medium text-white">{dc.label}</div>
+                  <div className="text-[10px] text-slate-500">{dc.description}</div>
+                </td>
+                {pqcAlgorithms.map((alg) => {
+                  const suit = alg.suitability[dc.id];
+                  return (
+                    <td key={alg.id} className="p-2 text-center">
+                      <button
+                        onClick={() => setSelected(alg)}
+                        className={`inline-flex items-center justify-center w-10 h-10 rounded-lg transition-colors ${suitBg(suit)}`}
+                      >
+                        <SuitabilityIcon level={suit} />
+                      </button>
+                    </td>
+                  );
+                })}
+              </motion.tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      {/* Legend */}
+      <div className="flex items-center gap-6 mt-4 pt-4 border-t border-slate-700/30">
+        <div className="flex items-center gap-2 text-xs text-slate-400">
+          <Check className="w-3.5 h-3.5 text-emerald-400" /> Good fit
+        </div>
+        <div className="flex items-center gap-2 text-xs text-slate-400">
+          <AlertTriangle className="w-3.5 h-3.5 text-yellow-400" /> Moderate
+        </div>
+        <div className="flex items-center gap-2 text-xs text-slate-400">
+          <XIcon className="w-3.5 h-3.5 text-red-400" /> Poor fit
+        </div>
+      </div>
+
+      {/* Detail panel */}
+      <AnimatePresence>
+        {selected && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm"
+            onClick={() => setSelected(null)}
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              onClick={(e) => e.stopPropagation()}
+              className="bg-slate-900 border border-slate-700/50 rounded-2xl p-6 max-w-md w-full mx-4 shadow-2xl"
+            >
+              <div className="flex items-start justify-between mb-4">
+                <div>
+                  <h3 className="text-xl font-bold text-white">{selected.name}</h3>
+                  <p className="text-sm text-slate-400">{selected.family}</p>
+                </div>
+                <button onClick={() => setSelected(null)} className="p-1 hover:bg-slate-800 rounded-lg">
+                  <X className="w-5 h-5 text-slate-400" />
+                </button>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3 mb-4">
+                <div className="bg-slate-800/50 rounded-lg p-3">
+                  <p className="text-xs text-slate-400 mb-1">Type</p>
+                  <p className="text-sm font-semibold text-white uppercase">{selected.type === 'kem' ? 'Key Encapsulation' : 'Digital Signature'}</p>
+                </div>
+                <div className="bg-slate-800/50 rounded-lg p-3">
+                  <p className="text-xs text-slate-400 mb-1">NIST Level</p>
+                  <p className="text-sm font-semibold text-white">{selected.nistLevel}</p>
+                </div>
+                <div className="bg-slate-800/50 rounded-lg p-3">
+                  <p className="text-xs text-slate-400 mb-1">Public Key</p>
+                  <p className="text-sm font-semibold text-white">{formatBytes(selected.publicKeySize)}</p>
+                </div>
+                <div className="bg-slate-800/50 rounded-lg p-3">
+                  <p className="text-xs text-slate-400 mb-1">{selected.type === 'kem' ? 'Ciphertext' : 'Signature'}</p>
+                  <p className="text-sm font-semibold text-white">
+                    {formatBytes(selected.type === 'kem' ? selected.ciphertextSize! : selected.signatureSize!)}
+                  </p>
+                </div>
+              </div>
+
+              <div className="bg-slate-800/30 rounded-lg p-3">
+                <p className="text-xs text-slate-400 mb-1">Notes</p>
+                <p className="text-sm text-slate-200">{selected.notes}</p>
+              </div>
+
+              <div className="mt-4 space-y-2">
+                <p className="text-xs text-slate-400 uppercase tracking-wider">Suitability by Device Class</p>
+                {deviceClasses.map((dc) => (
+                  <div key={dc.id} className="flex items-center justify-between">
+                    <span className="text-sm text-slate-300">{dc.label}</span>
+                    <div className="flex items-center gap-2">
+                      <SuitabilityIcon level={selected.suitability[dc.id]} />
+                      <span className="text-xs text-slate-400 capitalize w-16">{selected.suitability[dc.id]}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}

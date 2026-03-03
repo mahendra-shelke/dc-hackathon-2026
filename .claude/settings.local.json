@@ -1,0 +1,24 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:www.digicert.com)",
+      "WebSearch",
+      "WebFetch(domain:dev.digicert.com)",
+      "WebFetch(domain:docs.digicert.com)",
+      "WebFetch(domain:arxiv.org)",
+      "WebFetch(domain:www.appviewx.com)",
+      "WebFetch(domain:www.mdpi.com)",
+      "WebFetch(domain:labs.digicert.com)",
+      "WebFetch(domain:www.encryptionconsulting.com)",
+      "WebFetch(domain:pqshield.com)",
+      "WebFetch(domain:securityboulevard.com)",
+      "WebFetch(domain:openquantumsafe.org)",
+      "WebFetch(domain:www.iotinsider.com)",
+      "WebFetch(domain:postquantum.com)",
+      "WebFetch(domain:www.keyfactor.com)",
+      "Bash(node:*)",
+      "Bash(npm create:*)",
+      "Bash(npm install:*)"
+    ]
+  }
+}
