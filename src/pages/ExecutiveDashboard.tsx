@@ -9,14 +9,17 @@ import { deviceGroups } from '../data/devices';
 import { totalDevices, countByStatus, expiringCerts, countByRisk, totalDataAtRisk, daysUntil, formatNumber } from '../utils';
 
 export default function ExecutiveDashboard() {
-  const { state, isSimulated } = useSimulation();
+  const { state, isSimulated, discoveredDeviceGroups } = useSimulation();
+  const hasDiscovery = discoveredDeviceGroups.length > 0;
+  const allDeviceGroups = hasDiscovery ? [...deviceGroups, ...discoveredDeviceGroups] : deviceGroups;
 
-  const total = totalDevices(deviceGroups);
-  const readyCount = isSimulated ? state.devicesReady : countByStatus(deviceGroups, 'ready');
+  const total = totalDevices(allDeviceGroups);
+  const discoveredCount = hasDiscovery ? totalDevices(discoveredDeviceGroups) : 0;
+  const readyCount = isSimulated ? state.devicesReady : countByStatus(allDeviceGroups, 'ready') + (hasDiscovery ? countByStatus(discoveredDeviceGroups, 'hybrid') : 0);
   const readyPct = Math.round((readyCount / total) * 100);
-  const expiring = expiringCerts(deviceGroups, 12);
-  const critical = isSimulated ? Math.round(countByRisk(deviceGroups, 'critical') * (1 - state.riskReduction / 100)) : countByRisk(deviceGroups, 'critical');
-  const dataAtRisk = isSimulated ? Math.round(totalDataAtRisk(deviceGroups) * (1 - state.riskReduction / 100)) : totalDataAtRisk(deviceGroups);
+  const expiring = expiringCerts(allDeviceGroups, 12);
+  const critical = isSimulated ? Math.round(countByRisk(deviceGroups, 'critical') * (1 - state.riskReduction / 100)) : countByRisk(allDeviceGroups, 'critical');
+  const dataAtRisk = isSimulated ? Math.round(totalDataAtRisk(deviceGroups) * (1 - state.riskReduction / 100)) : totalDataAtRisk(allDeviceGroups);
   const cnsaDays = daysUntil('2027-01-01');
 
   return (
@@ -36,13 +39,20 @@ export default function ExecutiveDashboard() {
 
         {/* Stat cards */}
         <div className="col-span-8 grid grid-cols-2 gap-4">
-          <StatCard
-            label="Total Devices"
-            value={total}
-            format={formatNumber}
-            icon={Cpu}
-            delay={0.15}
-          />
+          <div className="relative">
+            <StatCard
+              label="Total Devices"
+              value={total}
+              format={formatNumber}
+              icon={Cpu}
+              delay={0.15}
+            />
+            {hasDiscovery && (
+              <span className="absolute top-3 right-3 px-2 py-0.5 text-[10px] font-medium rounded-full bg-[#0C6DFD]/20 text-[#0C6DFD] border border-[#0C6DFD]/30">
+                +{discoveredCount} from Discovery
+              </span>
+            )}
+          </div>
           <StatCard
             label="PQC Ready"
             value={readyPct}
@@ -119,9 +129,9 @@ export default function ExecutiveDashboard() {
             <h3 className="text-sm font-semibold text-white mb-3">Migration Status</h3>
             <div className="flex gap-3">
               {[
-                { label: 'Not Ready', count: countByStatus(deviceGroups, 'not-ready'), color: '#EF4444' },
-                { label: 'Hybrid', count: countByStatus(deviceGroups, 'hybrid'), color: '#3B82F6' },
-                { label: 'PQC Ready', count: countByStatus(deviceGroups, 'ready'), color: '#10B981' },
+                { label: 'Not Ready', count: countByStatus(allDeviceGroups, 'not-ready'), color: '#EF4444' },
+                { label: 'Hybrid', count: countByStatus(allDeviceGroups, 'hybrid'), color: '#3B82F6' },
+                { label: 'PQC Ready', count: countByStatus(allDeviceGroups, 'ready'), color: '#10B981' },
               ].map((s) => {
                 const pct = Math.round((s.count / total) * 100);
                 return (

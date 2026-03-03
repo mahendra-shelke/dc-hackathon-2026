@@ -80,3 +80,79 @@ export interface SimulationState {
   certsUpdated: number;
   riskReduction: number;
 }
+
+// --- Discovery Connector Types ---
+
+export type ConnectorType = 'azure-iot' | 'aws-iot' | 'scada-opcua' | 'matter-thread' | 'custom-api';
+
+export type ConnectorStatus = 'disconnected' | 'connecting' | 'connected' | 'error';
+
+export interface ConnectorConfig {
+  id: string;
+  type: ConnectorType;
+  name: string;
+  icon: string;
+  status: ConnectorStatus;
+  endpoint: string;
+  protocol: string;
+  devicesDiscovered: number;
+  color: string;
+}
+
+export type DiscoveryPipelineStep = 'idle' | 'discovering' | 'assessing' | 'deploying' | 'complete';
+
+export type DeploymentStatus = 'pending' | 'updating' | 'verified' | 'failed';
+
+export interface DiscoveredDevice {
+  id: string;
+  connectorId: string;
+  ipAddress: string;
+  hostname: string;
+  deviceType: string;
+  manufacturer: string;
+  firmwareVersion: string;
+  currentAlgorithm: string;
+  keySize: number;
+  industry: Industry;
+  deviceClass: DeviceClass;
+  assessment?: DeviceAssessment;
+  deployment?: DeviceDeployment;
+}
+
+export interface DeviceAssessment {
+  algorithmCompatibility: Record<string, 'compatible' | 'partial' | 'incompatible'>;
+  firmwareUpdateCapable: boolean;
+  recommendedPqc: string;
+  riskScore: number;
+  riskLevel: RiskLevel;
+  pqcStatus: PqcStatus;
+  memoryKB: number;
+  cpuMHz: number;
+}
+
+export interface DeviceDeployment {
+  status: DeploymentStatus;
+  certType: 'hybrid' | 'full-pqc';
+  algorithm: string;
+  progress: number;
+  rollbackAvailable: boolean;
+}
+
+export interface DiscoveryLogEntry {
+  id: number;
+  timestamp: string;
+  type: 'info' | 'success' | 'warning' | 'error';
+  message: string;
+  deviceId?: string;
+}
+
+export interface DiscoveryState {
+  connectors: ConnectorConfig[];
+  discoveredDevices: DiscoveredDevice[];
+  pipelineStep: DiscoveryPipelineStep;
+  discoveryProgress: number;
+  assessmentProgress: number;
+  deploymentProgress: number;
+  logEntries: DiscoveryLogEntry[];
+  isComplete: boolean;
+}

@@ -2,12 +2,13 @@ import { NavLink, useLocation } from 'react-router';
 import { motion } from 'framer-motion';
 import {
   LayoutDashboard, Clock, Grid3X3, FlaskConical,
-  FileKey, GitBranch, Play, RotateCcw, Shield,
+  FileKey, GitBranch, Play, RotateCcw, Shield, Radar,
 } from 'lucide-react';
 import { useSimulation } from '../../hooks/useSimulation';
 
 const navItems = [
   { to: '/', icon: LayoutDashboard, label: 'Executive Dashboard' },
+  { to: '/discovery', icon: Radar, label: 'Discovery' },
   { to: '/hndl', icon: Clock, label: 'HNDL Risk Timeline' },
   { to: '/fleet', icon: Grid3X3, label: 'Fleet Heatmap' },
   { to: '/algorithms', icon: FlaskConical, label: 'Algorithm Matrix' },

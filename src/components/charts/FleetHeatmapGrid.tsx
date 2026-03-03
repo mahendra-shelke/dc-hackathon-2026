@@ -3,16 +3,22 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X } from 'lucide-react';
 import type { DeviceGroup } from '../../types';
 import { deviceGroups } from '../../data/devices';
+import { useSimulation } from '../../hooks/useSimulation';
 import { riskColor } from '../../theme/colors';
 import { PqcBadge, RiskBadge } from '../common/StatusBadge';
 import FilterBar from '../common/FilterBar';
 
 export default function FleetHeatmapGrid() {
+  const { discoveredDeviceGroups } = useSimulation();
+  const allDeviceGroups = discoveredDeviceGroups.length > 0
+    ? [...deviceGroups, ...discoveredDeviceGroups]
+    : deviceGroups;
+
   const [industryFilter, setIndustryFilter] = useState<string>('all');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [selected, setSelected] = useState<DeviceGroup | null>(null);
 
-  const filtered = deviceGroups.filter((d) => {
+  const filtered = allDeviceGroups.filter((d) => {
     if (industryFilter !== 'all' && d.industry !== industryFilter) return false;
     if (statusFilter !== 'all' && d.pqcStatus !== statusFilter) return false;
     return true;
@@ -72,6 +78,11 @@ export default function FleetHeatmapGrid() {
               className="absolute top-3 right-3 w-3 h-3 rounded-full"
               style={{ backgroundColor: cellColor(device), boxShadow: `0 0 8px ${cellColor(device)}60` }}
             />
+            {device.id.startsWith('disc-') && (
+              <span className="absolute top-3 left-3 px-1.5 py-0.5 text-[9px] font-bold rounded bg-[#0C6DFD]/20 text-[#0C6DFD] border border-[#0C6DFD]/30 uppercase tracking-wider">
+                New
+              </span>
+            )}
 
             <h4 className="text-sm font-semibold text-white mb-1 pr-4">{device.name}</h4>
             <p className="text-xs text-slate-400 capitalize mb-3">{device.industry.replace('-', ' ')}</p>

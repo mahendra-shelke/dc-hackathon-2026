@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useCallback, useRef, type ReactNode } from 'react';
-import type { SimulationState } from '../types';
+import type { SimulationState, DeviceGroup } from '../types';
 
 const initialState: SimulationState = {
   isRunning: false,
@@ -24,6 +24,8 @@ interface SimulationContextType {
   isSimulated: boolean;
   startSimulation: () => void;
   resetSimulation: () => void;
+  discoveredDeviceGroups: DeviceGroup[];
+  addDiscoveredDevices: (groups: DeviceGroup[]) => void;
 }
 
 const SimulationContext = createContext<SimulationContextType | null>(null);
@@ -43,6 +45,7 @@ function lerpState(t: number): SimulationState {
 export function SimulationProvider({ children }: { children: ReactNode }) {
   const [state, setState] = useState<SimulationState>(initialState);
   const [isSimulated, setIsSimulated] = useState(false);
+  const [discoveredDeviceGroups, setDiscoveredDeviceGroups] = useState<DeviceGroup[]>([]);
   const rafId = useRef(0);
 
   const startSimulation = useCallback(() => {
@@ -74,8 +77,12 @@ export function SimulationProvider({ children }: { children: ReactNode }) {
     setIsSimulated(false);
   }, []);
 
+  const addDiscoveredDevices = useCallback((groups: DeviceGroup[]) => {
+    setDiscoveredDeviceGroups(groups);
+  }, []);
+
   return (
-    <SimulationContext.Provider value={{ state, isSimulated, startSimulation, resetSimulation }}>
+    <SimulationContext.Provider value={{ state, isSimulated, startSimulation, resetSimulation, discoveredDeviceGroups, addDiscoveredDevices }}>
       {children}
     </SimulationContext.Provider>
   );
