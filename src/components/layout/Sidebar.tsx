@@ -1,10 +1,11 @@
-import { NavLink, useLocation } from 'react-router';
+import { NavLink, useLocation, useNavigate } from 'react-router';
 import { motion } from 'framer-motion';
 import {
   LayoutDashboard, FlaskConical,
-  Play, RotateCcw, Shield, Radar,
+  Play, RotateCcw, Radar,
   Palette, Check, Map, BookOpen,
 } from 'lucide-react';
+import DigiCertLogo from '../icons/DigiCertLogo';
 import { useSimulation } from '../../hooks/useSimulation';
 import { useTheme, themes } from '../../hooks/useTheme';
 import { useStory } from '../../hooks/useStory';
@@ -20,6 +21,7 @@ const navItems = [
 
 export default function Sidebar() {
   const location = useLocation();
+  const navigate = useNavigate();
   const { state, isSimulated, startSimulation, resetSimulation } = useSimulation();
   const { theme, setTheme, isLight } = useTheme();
   const { isOpen, togglePanel } = useStory();
@@ -36,8 +38,8 @@ export default function Sidebar() {
       {/* Logo */}
       <div className="p-5" style={{ borderBottom: '1px solid var(--theme-sidebar-border)' }}>
         <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-lg flex items-center justify-center" style={{ backgroundColor: 'var(--theme-card)', border: '1px solid var(--theme-card-border)' }}>
-            <Shield className="w-5 h-5" style={{ color: 'var(--theme-text)' }} />
+          <div className="w-9 h-9 rounded-lg flex items-center justify-center overflow-hidden" style={{ backgroundColor: 'var(--theme-card)', border: '1px solid var(--theme-card-border)' }}>
+            <DigiCertLogo className="w-7 h-7" />
           </div>
           <div>
             <div className="text-sm font-bold tracking-wide" style={{ color: 'var(--theme-text)' }}>DigiCert</div>
@@ -149,7 +151,7 @@ export default function Sidebar() {
         {!isSimulated && !state.isRunning && (
           <button
             type="button"
-            onClick={startSimulation}
+            onClick={() => { startSimulation(); navigate('/blueprint'); }}
             className="w-full flex items-center justify-center gap-2 px-4 py-3 text-sm font-semibold rounded-lg transition-colors"
             style={{ backgroundColor: 'var(--theme-text)', color: 'var(--theme-bg)' }}
           >

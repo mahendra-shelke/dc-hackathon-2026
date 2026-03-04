@@ -2,7 +2,7 @@ import { motion } from 'framer-motion';
 import {
   Map, CheckCircle2, Lock, Server, Cpu, Radio,
   ShieldCheck, AlertTriangle, TrendingUp, Clock, Users,
-  ChevronRight,
+  ChevronRight, Play, RotateCcw,
 } from 'lucide-react';
 import { blueprintSteps } from '../data/blueprint';
 import { deviceGroups } from '../data/devices';
@@ -187,7 +187,7 @@ function StepCard({ step, index }: { step: BlueprintStep; index: number }) {
 }
 
 export default function BlueprintPage() {
-  const { state } = useSimulation();
+  const { state, isSimulated, startSimulation, resetSimulation } = useSimulation();
   const devicesReady = Math.floor(TOTAL_DEVICES * (state.readinessScore / 100));
   const projection = getProjectedCompletion(devicesReady);
   const progressPercent = Math.round((devicesReady / TOTAL_DEVICES) * 100);
@@ -226,11 +226,50 @@ export default function BlueprintPage() {
     <div className="p-6 space-y-6 max-w-6xl mx-auto">
       {/* Page header */}
       <motion.div initial={{ opacity: 0, y: -12 }} animate={{ opacity: 1, y: 0 }}>
-        <div className="flex items-center gap-3 mb-1">
-          <Map className="w-6 h-6" style={{ color: 'var(--theme-text-muted)' }} />
-          <h1 className="text-2xl font-bold" style={{ color: 'var(--theme-text)' }}>
-            PQC Readiness Blueprint
-          </h1>
+        <div className="flex items-center justify-between mb-1">
+          <div className="flex items-center gap-3">
+            <Map className="w-6 h-6" style={{ color: 'var(--theme-text-muted)' }} />
+            <h1 className="text-2xl font-bold" style={{ color: 'var(--theme-text)' }}>
+              PQC Readiness Blueprint
+            </h1>
+          </div>
+
+          {/* Simulation controls — inline with header */}
+          {!isSimulated && !state.isRunning && (
+            <button
+              type="button"
+              onClick={startSimulation}
+              className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg transition-colors"
+              style={{ backgroundColor: 'var(--theme-text)', color: 'var(--theme-bg)' }}
+            >
+              <Play className="w-3.5 h-3.5" />
+              Simulate Migration
+            </button>
+          )}
+          {state.isRunning && (
+            <div className="flex items-center gap-3 min-w-[180px]">
+              <span className="text-[11px] whitespace-nowrap" style={{ color: 'var(--theme-text-muted)' }}>
+                {Math.round(state.progress * 100)}%
+              </span>
+              <div className="flex-1 h-1.5 rounded-full overflow-hidden" style={{ backgroundColor: 'var(--theme-bar-bg)' }}>
+                <motion.div
+                  className="h-full rounded-full"
+                  style={{ width: `${state.progress * 100}%`, backgroundColor: 'var(--theme-text-secondary)' }}
+                />
+              </div>
+            </div>
+          )}
+          {isSimulated && !state.isRunning && (
+            <button
+              type="button"
+              onClick={resetSimulation}
+              className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg transition-colors"
+              style={{ backgroundColor: 'var(--theme-card)', color: 'var(--theme-text)', border: '1px solid var(--theme-card-border)' }}
+            >
+              <RotateCcw className="w-3.5 h-3.5" />
+              Reset
+            </button>
+          )}
         </div>
         <p className="text-sm" style={{ color: 'var(--theme-text-muted)' }}>
           A device-aware, ordered migration plan. Will your fleet meet the CNSA 2.0 deadline?

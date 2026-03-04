@@ -1,0 +1,32 @@
+export default function DigiCertLogo({ className }: { className?: string }) {
+  return (
+    <svg
+      viewBox="0 0 256 256"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      className={className}
+    >
+      <path
+        d="M128 16L32 64v80c0 53.02 40.84 102.36 96 120 55.16-17.64 96-66.98 96-120V64L128 16z"
+        fill="#003A70"
+      />
+      <path
+        d="M128 32L48 72v72c0 46.4 35.2 89.76 80 106 44.8-16.24 80-59.6 80-106V72L128 32z"
+        fill="#0054A6"
+      />
+      <circle cx="128" cy="120" r="32" fill="#FFB81C" />
+      <path
+        d="M116 120l8 8 20-20"
+        stroke="#003A70"
+        strokeWidth="6"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M128 168c-12 0-20-4-20-4v16s8 6 20 6 20-6 20-6v-16s-8 4-20 4z"
+        fill="#FFB81C"
+        opacity="0.6"
+      />
+    </svg>
+  );
+}
