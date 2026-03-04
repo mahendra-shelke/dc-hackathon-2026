@@ -18,7 +18,9 @@
       "WebFetch(domain:www.keyfactor.com)",
       "Bash(node:*)",
       "Bash(npm create:*)",
-      "Bash(npm install:*)"
+      "Bash(npm install:*)",
+      "Bash(python3 -c \":*)",
+      "Bash(pip3 install python-pptx)"
     ]
   }
 }
