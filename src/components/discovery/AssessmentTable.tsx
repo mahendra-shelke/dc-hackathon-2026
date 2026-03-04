@@ -63,7 +63,7 @@ export default function AssessmentTable() {
                 )}
               </td>
               <td className="py-2 px-3">
-                <span className="px-2 py-0.5 text-[11px] font-medium rounded-full bg-[#0C6DFD]/20 text-[#0C6DFD] border border-[#0C6DFD]/30">
+                <span className="px-2 py-0.5 text-[11px] font-medium rounded-full" style={{ backgroundColor: 'var(--theme-card-inner)', color: 'var(--theme-text-secondary)', border: '1px solid var(--theme-card-border)' }}>
                   {device.assessment!.recommendedPqc}
                 </span>
               </td>

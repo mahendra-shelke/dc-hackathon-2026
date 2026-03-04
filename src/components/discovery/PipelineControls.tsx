@@ -72,28 +72,26 @@ export default function PipelineControls() {
                 <motion.div
                   animate={{
                     scale: isActive && !isDone ? [1, 1.08, 1] : 1,
-                    boxShadow: isActive && !isDone ? '0 0 16px rgba(12, 109, 253, 0.4)' : '0 0 0px transparent',
                   }}
                   transition={{ duration: 1.5, repeat: isActive && !isDone ? Infinity : 0 }}
-                  className={`w-10 h-10 rounded-full flex items-center justify-center border-2 transition-colors ${
-                    isDone
-                      ? 'bg-emerald-500/20 border-emerald-500 text-emerald-400'
-                      : isActive
-                        ? 'bg-[#0C6DFD]/20 border-[#0C6DFD] text-[#0C6DFD]'
-                        : 'bg-slate-800/60 border-slate-600 text-slate-500'
-                  }`}
+                  className="w-10 h-10 rounded-full flex items-center justify-center border-2 transition-colors"
+                  style={{
+                    backgroundColor: isDone ? 'rgba(16,185,129,0.15)' : isActive ? 'var(--theme-card)' : 'var(--theme-card-inner)',
+                    borderColor: isDone ? 'rgba(16,185,129,0.5)' : isActive ? 'var(--theme-text-secondary)' : 'var(--theme-card-border)',
+                    color: isDone ? '#6EE7B7' : isActive ? 'var(--theme-text)' : 'var(--theme-text-dim)',
+                  }}
                 >
                   <StepIcon className="w-4.5 h-4.5" />
                 </motion.div>
-                <p className={`text-[11px] mt-1.5 font-medium ${isDone ? 'text-emerald-400' : isActive ? 'text-white' : 'text-slate-500'}`}>
+                <p className="text-[11px] mt-1.5 font-medium" style={{ color: isDone ? '#6EE7B7' : isActive ? 'var(--theme-text)' : 'var(--theme-text-dim)' }}>
                   {step.label}
                 </p>
-                <p className={`text-[10px] ${isFuture ? 'text-slate-600' : 'text-slate-400'}`}>
+                <p className="text-[10px]" style={{ color: isFuture ? 'var(--theme-text-dim)' : 'var(--theme-text-muted)' }}>
                   {step.product}
                 </p>
               </div>
               {i < steps.length - 1 && (
-                <div className={`w-16 h-0.5 mb-8 rounded-full transition-colors ${currentIdx > i ? 'bg-emerald-500' : currentIdx === i ? 'bg-[#0C6DFD]/50' : 'bg-slate-700'}`} />
+                <div className="w-16 h-0.5 mb-8 rounded-full transition-colors" style={{ backgroundColor: currentIdx > i ? 'rgba(16,185,129,0.5)' : currentIdx === i ? 'var(--theme-text-secondary)' : 'var(--theme-card-border)' }} />
               )}
             </div>
           );
@@ -103,13 +101,14 @@ export default function PipelineControls() {
       {/* Progress bar (when step is running) */}
       {isRunning && (
         <div className="mb-4">
-          <div className="flex items-center justify-between text-xs text-slate-400 mb-1">
+          <div className="flex items-center justify-between text-xs mb-1" style={{ color: 'var(--theme-text-muted)' }}>
             <span>{steps[currentIdx]?.label}</span>
             <span>{progressForStep}%</span>
           </div>
-          <div className="h-2 bg-slate-700 rounded-full overflow-hidden">
+          <div className="h-2 rounded-full overflow-hidden" style={{ backgroundColor: 'var(--theme-bar-bg)' }}>
             <motion.div
-              className="h-full bg-[#0C6DFD] rounded-full"
+              className="h-full rounded-full"
+              style={{ backgroundColor: 'var(--theme-text-secondary)' }}
               animate={{ width: `${progressForStep}%` }}
               transition={{ duration: 0.3 }}
             />
@@ -121,13 +120,17 @@ export default function PipelineControls() {
       <button
         onClick={btn.onClick}
         disabled={btn.disabled}
-        className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-[#0C6DFD] hover:bg-[#0955CC] disabled:bg-slate-700 disabled:text-slate-500 disabled:cursor-not-allowed text-white text-sm font-semibold rounded-lg transition-colors"
+        className="w-full flex items-center justify-center gap-2 px-4 py-3 disabled:cursor-not-allowed text-sm font-semibold rounded-lg transition-colors"
+        style={{
+          backgroundColor: btn.disabled ? 'var(--theme-card-inner)' : 'var(--theme-text)',
+          color: btn.disabled ? 'var(--theme-text-dim)' : 'var(--theme-bg)',
+        }}
       >
         <Play className="w-4 h-4" />
         {btn.label}
       </button>
       {state.pipelineStep === 'idle' && connectedCount === 0 && (
-        <p className="text-[11px] text-slate-500 text-center mt-2">Connect at least one platform to begin</p>
+        <p className="text-[11px] text-center mt-2" style={{ color: 'var(--theme-text-dim)' }}>Connect at least one platform to begin</p>
       )}
     </GlassCard>
   );

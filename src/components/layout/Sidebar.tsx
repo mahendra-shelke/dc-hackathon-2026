@@ -12,7 +12,7 @@ import { useState } from 'react';
 
 // Core demo pages — keep this list short and executive-friendly
 const navItems = [
-  { to: '/', icon: LayoutDashboard, label: 'Overview' },
+  { to: '/', icon: LayoutDashboard, label: 'Dashboard' },
   { to: '/discovery', icon: Radar, label: 'Discovery' },
   { to: '/blueprint', icon: Map, label: 'Readiness Blueprint' },
   { to: '/algorithms', icon: FlaskConical, label: 'Algorithm Intel' },
@@ -36,8 +36,8 @@ export default function Sidebar() {
       {/* Logo */}
       <div className="p-5" style={{ borderBottom: '1px solid var(--theme-sidebar-border)' }}>
         <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-lg bg-[#0C6DFD] flex items-center justify-center">
-            <Shield className="w-5 h-5 text-white" />
+          <div className="w-9 h-9 rounded-lg flex items-center justify-center" style={{ backgroundColor: 'var(--theme-card)', border: '1px solid var(--theme-card-border)' }}>
+            <Shield className="w-5 h-5" style={{ color: 'var(--theme-text)' }} />
           </div>
           <div>
             <div className="text-sm font-bold tracking-wide" style={{ color: 'var(--theme-text)' }}>DigiCert</div>
@@ -59,13 +59,14 @@ export default function Sidebar() {
               {isActive && (
                 <motion.div
                   layoutId="sidebar-active"
-                  className="absolute inset-0 bg-[#0C6DFD]/15 border border-[#0C6DFD]/30 rounded-lg"
+                  className="absolute inset-0 rounded-lg"
+                  style={{ backgroundColor: 'var(--theme-card)', border: '1px solid var(--theme-card-border)' }}
                   transition={{ type: 'spring', stiffness: 350, damping: 30 }}
                 />
               )}
               <item.icon
                 className="w-4 h-4 relative z-10 transition-colors"
-                style={{ color: isActive ? '#0C6DFD' : 'var(--theme-text-muted)' }}
+                style={{ color: isActive ? 'var(--theme-text)' : 'var(--theme-text-muted)' }}
               />
               <span
                 className={`relative z-10 transition-colors ${isActive ? 'font-medium' : ''}`}
@@ -112,11 +113,11 @@ export default function Sidebar() {
                   className="w-4 h-4 rounded-full border-2 shrink-0"
                   style={{
                     backgroundColor: t.preview,
-                    borderColor: theme === t.id ? '#0C6DFD' : 'var(--theme-card-border)',
+                    borderColor: theme === t.id ? 'var(--theme-text-secondary)' : 'var(--theme-card-border)',
                   }}
                 />
                 <span className="flex-1 text-left">{t.label}</span>
-                {theme === t.id && <Check className="w-3 h-3 text-[#0C6DFD]" />}
+                {theme === t.id && <Check className="w-3 h-3" style={{ color: 'var(--theme-text)' }} />}
               </button>
             ))}
           </div>
@@ -130,15 +131,15 @@ export default function Sidebar() {
           onClick={togglePanel}
           className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-xs transition-colors"
           style={{
-            color: isOpen ? '#0C6DFD' : 'var(--theme-text-muted)',
-            backgroundColor: isOpen ? 'rgba(12,109,253,0.12)' : 'transparent',
-            border: isOpen ? '1px solid rgba(12,109,253,0.3)' : '1px solid transparent',
+            color: isOpen ? 'var(--theme-text)' : 'var(--theme-text-muted)',
+            backgroundColor: isOpen ? 'var(--theme-card)' : 'transparent',
+            border: isOpen ? '1px solid var(--theme-card-border)' : '1px solid transparent',
           }}
         >
           <BookOpen className="w-3.5 h-3.5" />
           <span>Story Mode</span>
           {isOpen && (
-            <span className="ml-auto text-[10px] font-semibold text-[#0C6DFD]">ON</span>
+            <span className="ml-auto text-[10px] font-semibold" style={{ color: '#E5753C' }}>ON</span>
           )}
         </button>
       </div>
@@ -149,7 +150,8 @@ export default function Sidebar() {
           <button
             type="button"
             onClick={startSimulation}
-            className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-[#0C6DFD] hover:bg-[#0955CC] text-white text-sm font-semibold rounded-lg transition-colors"
+            className="w-full flex items-center justify-center gap-2 px-4 py-3 text-sm font-semibold rounded-lg transition-colors"
+            style={{ backgroundColor: 'var(--theme-text)', color: 'var(--theme-bg)' }}
           >
             <Play className="w-4 h-4" />
             Simulate Migration
@@ -163,8 +165,8 @@ export default function Sidebar() {
             </div>
             <div className="h-2 rounded-full overflow-hidden" style={{ backgroundColor: 'var(--theme-bar-bg)' }}>
               <motion.div
-                className="h-full bg-[#0C6DFD] rounded-full"
-                style={{ width: `${state.progress * 100}%` }}
+                className="h-full rounded-full"
+                style={{ width: `${state.progress * 100}%`, backgroundColor: 'var(--theme-text-secondary)' }}
               />
             </div>
           </div>

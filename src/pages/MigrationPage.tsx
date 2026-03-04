@@ -7,7 +7,7 @@ const productCards = [
     phase: 'Discovery & Audit',
     product: 'Device Trust Manager',
     icon: Search,
-    color: '#0C6DFD',
+    color: '#A1A1AA',
     description: 'Automated discovery and inventory of all device certificates, keys, and cryptographic algorithms across the entire fleet.',
     features: ['Certificate inventory', 'Algorithm detection', 'Risk scoring', 'Compliance gaps'],
   },

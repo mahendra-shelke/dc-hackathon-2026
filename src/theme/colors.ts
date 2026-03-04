@@ -1,7 +1,7 @@
 export const colors = {
-  digicert: '#0C6DFD',
-  digicertDark: '#0955CC',
-  digicertLight: '#3D8DFD',
+  digicert: '#A1A1AA',
+  digicertDark: '#71717A',
+  digicertLight: '#D4D4D8',
 
   risk: {
     critical: '#EF4444',
@@ -11,9 +11,9 @@ export const colors = {
   },
 
   pqc: {
-    ready: '#10B981',
-    hybrid: '#3B82F6',
-    notReady: '#EF4444',
+    ready: '#A1A1AA',
+    hybrid: '#71717A',
+    notReady: '#E5753C',
   },
 
   industry: {
@@ -25,8 +25,8 @@ export const colors = {
   },
 
   chart: [
-    '#0C6DFD', '#10B981', '#F97316', '#EC4899', '#8B5CF6',
-    '#06B6D4', '#EAB308', '#EF4444', '#14B8A6', '#F43F5E',
+    '#A1A1AA', '#71717A', '#E5753C', '#D4D4D8', '#52525B',
+    '#A3A3A3', '#78716C', '#9CA3AF', '#6B7280', '#57534E',
   ],
 
   glass: {

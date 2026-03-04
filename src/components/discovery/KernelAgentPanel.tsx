@@ -13,13 +13,13 @@ function heartbeatLabel(offsetMs: number): string {
 function certBadge(certStatus: KernelAgent['certStatus']) {
   switch (certStatus) {
     case 'none':
-      return { label: 'No Cert', bg: 'rgba(239,68,68,0.15)', color: '#EF4444' };
+      return { label: 'No Cert', bg: 'var(--theme-card-inner)', color: '#E5753C' };
     case 'classical':
-      return { label: 'Classical', bg: 'rgba(249,115,22,0.15)', color: '#F97316' };
+      return { label: 'Classical', bg: 'var(--theme-card-inner)', color: 'var(--theme-text-muted)' };
     case 'hybrid':
-      return { label: 'Hybrid', bg: 'rgba(59,130,246,0.15)', color: '#3B82F6' };
+      return { label: 'Hybrid', bg: 'var(--theme-card-inner)', color: 'var(--theme-text-secondary)' };
     case 'pqc':
-      return { label: 'PQC', bg: 'rgba(16,185,129,0.15)', color: '#10B981' };
+      return { label: 'PQC', bg: 'var(--theme-card-inner)', color: 'var(--theme-text)' };
   }
 }
 
@@ -36,9 +36,9 @@ function AgentRow({ agent, tick }: { agent: KernelAgent; tick: number }) {
       <td className="py-2.5 pr-4">
         <div className="flex items-center gap-2">
           {agent.agentType === 'trustEdge' ? (
-            <ShieldCheck className="w-3.5 h-3.5 text-[#0C6DFD] flex-shrink-0" />
+            <ShieldCheck className="w-3.5 h-3.5 flex-shrink-0" style={{ color: 'var(--theme-text-muted)' }} />
           ) : (
-            <Cpu className="w-3.5 h-3.5 text-orange-400 flex-shrink-0" />
+            <Cpu className="w-3.5 h-3.5 flex-shrink-0" style={{ color: 'var(--theme-text-secondary)' }} />
           )}
           <div>
             <div className="text-xs font-medium" style={{ color: 'var(--theme-text)' }}>
@@ -61,7 +61,7 @@ function AgentRow({ agent, tick }: { agent: KernelAgent; tick: number }) {
       <td className="py-2.5 pr-4">
         <span className="text-[11px]" style={{ color: 'var(--theme-text-secondary)' }}>
           {agent.currentAlgorithm === 'None' ? (
-            <span style={{ color: '#EF4444' }}>—</span>
+            <span style={{ color: '#E5753C' }}>—</span>
           ) : (
             agent.currentAlgorithm
           )}
@@ -77,13 +77,13 @@ function AgentRow({ agent, tick }: { agent: KernelAgent; tick: number }) {
       <td className="py-2.5">
         <div className="flex items-center gap-1.5">
           {isMissed ? (
-            <WifiOff className="w-3 h-3 text-red-400" />
+            <WifiOff className="w-3 h-3" style={{ color: '#E5753C' }} />
           ) : (
-            <Wifi className="w-3 h-3 text-emerald-400" />
+            <Wifi className="w-3 h-3" style={{ color: 'var(--theme-text-muted)' }} />
           )}
           <span
             className="text-[10px]"
-            style={{ color: isMissed ? '#EF4444' : 'var(--theme-text-muted)' }}
+            style={{ color: isMissed ? '#E5753C' : 'var(--theme-text-muted)' }}
           >
             {heartbeatLabel(effectiveOffset)}
           </span>
@@ -124,11 +124,11 @@ export default function KernelAgentPanel() {
       >
         <div className="flex items-center gap-3">
           <div className="flex -space-x-1">
-            <div className="w-7 h-7 rounded-full bg-[#0C6DFD]/20 border-2 border-[#0C6DFD]/40 flex items-center justify-center z-10">
-              <ShieldCheck className="w-3.5 h-3.5 text-[#0C6DFD]" />
+            <div className="agent-icon-circle w-7 h-7 rounded-full flex items-center justify-center z-10">
+              <ShieldCheck className="w-3.5 h-3.5" style={{ color: 'var(--theme-text-muted)' }} />
             </div>
-            <div className="w-7 h-7 rounded-full bg-orange-500/15 border-2 border-orange-500/30 flex items-center justify-center">
-              <Cpu className="w-3.5 h-3.5 text-orange-400" />
+            <div className="agent-icon-circle w-7 h-7 rounded-full flex items-center justify-center">
+              <Cpu className="w-3.5 h-3.5" style={{ color: 'var(--theme-text-secondary)' }} />
             </div>
           </div>
           <div>
@@ -138,7 +138,7 @@ export default function KernelAgentPanel() {
             <div className="text-[11px]" style={{ color: 'var(--theme-text-muted)' }}>
               {trustEdgeAgents.length} TrustEdge · {kernelModuleAgents.length} Kernel Module
               {noCertAgents.length > 0 && (
-                <span className="ml-2 text-red-400">
+                <span className="ml-2 agent-no-cert-label">
                   · {noCertAgents.length} No-Cert Detected
                 </span>
               )}
@@ -147,16 +147,16 @@ export default function KernelAgentPanel() {
         </div>
         <div className="flex items-center gap-3">
           <div className="flex gap-2">
-            <div className="flex items-center gap-1 text-[10px] px-2 py-1 rounded-md" style={{ backgroundColor: 'rgba(12,109,253,0.1)', color: '#0C6DFD' }}>
+            <div className="flex items-center gap-1 text-[10px] px-2 py-1 rounded-md" style={{ backgroundColor: 'var(--theme-card-inner)', color: 'var(--theme-text-secondary)' }}>
               <ShieldCheck className="w-3 h-3" />
               TrustEdge: {trustEdgeAgents.length}
             </div>
-            <div className="flex items-center gap-1 text-[10px] px-2 py-1 rounded-md" style={{ backgroundColor: 'rgba(249,115,22,0.1)', color: '#F97316' }}>
+            <div className="flex items-center gap-1 text-[10px] px-2 py-1 rounded-md" style={{ backgroundColor: 'var(--theme-card-inner)', color: 'var(--theme-text-muted)' }}>
               <Cpu className="w-3 h-3" />
               Kernel Mod: {kernelModuleAgents.length}
             </div>
             {noCertAgents.length > 0 && (
-              <div className="flex items-center gap-1 text-[10px] px-2 py-1 rounded-md" style={{ backgroundColor: 'rgba(239,68,68,0.1)', color: '#EF4444' }}>
+              <div className="flex items-center gap-1 text-[10px] px-2 py-1 rounded-md" style={{ backgroundColor: 'var(--theme-card-inner)', color: '#E5753C' }}>
                 <AlertTriangle className="w-3 h-3" />
                 No Cert: {noCertAgents.length}
               </div>

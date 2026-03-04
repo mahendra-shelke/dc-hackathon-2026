@@ -89,8 +89,8 @@ export default function RiskTimeline({ selectedIndustry }: Props) {
           ))}
 
           {/* Today marker */}
-          <line x1={todayX * 8} y1="25" x2={todayX * 8} y2="75" stroke="#0C6DFD" strokeWidth="2" />
-          <text x={todayX * 8} y="20" textAnchor="middle" fill="#0C6DFD" fontSize="11" fontWeight="600">TODAY</text>
+          <line x1={todayX * 8} y1="25" x2={todayX * 8} y2="75" stroke="#A1A1AA" strokeWidth="2" />
+          <text x={todayX * 8} y="20" textAnchor="middle" fill="#A1A1AA" fontSize="11" fontWeight="600">TODAY</text>
 
           {/* CNSA 2.0 marker */}
           <line x1="400" y1="25" x2="400" y2="75" stroke="#EAB308" strokeWidth="2" strokeDasharray="4" />

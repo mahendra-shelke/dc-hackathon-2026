@@ -32,7 +32,6 @@ export default function StoryPanel() {
             style={{
               backgroundColor: 'var(--theme-sidebar)',
               borderLeft: '1px solid var(--theme-sidebar-border)',
-              backdropFilter: 'blur(20px)',
             }}
           >
             {/* Header */}
@@ -41,8 +40,11 @@ export default function StoryPanel() {
               style={{ borderBottom: '1px solid var(--theme-sidebar-border)' }}
             >
               <div className="flex items-center gap-2.5">
-                <div className="w-7 h-7 rounded-md bg-[#0C6DFD] flex items-center justify-center">
-                  <BookOpen className="w-3.5 h-3.5 text-white" />
+                <div
+                  className="w-7 h-7 rounded-md flex items-center justify-center"
+                  style={{ backgroundColor: 'var(--theme-card)', border: '1px solid var(--theme-card-border)' }}
+                >
+                  <BookOpen className="w-3.5 h-3.5" style={{ color: 'var(--theme-text)' }} />
                 </div>
                 <div>
                   <div className="text-sm font-bold" style={{ color: 'var(--theme-text)' }}>
@@ -72,11 +74,9 @@ export default function StoryPanel() {
                     onClick={() => goToChapter(chapter.id)}
                     className="w-full text-left rounded-xl p-3.5 transition-all group"
                     style={{
-                      backgroundColor: isActive
-                        ? 'rgba(12,109,253,0.15)'
-                        : 'transparent',
+                      backgroundColor: isActive ? 'var(--theme-card)' : 'transparent',
                       border: isActive
-                        ? '1px solid rgba(12,109,253,0.35)'
+                        ? '1px solid var(--theme-card-border)'
                         : '1px solid transparent',
                     }}
                   >
@@ -85,8 +85,8 @@ export default function StoryPanel() {
                       <div
                         className="w-6 h-6 rounded-full flex-shrink-0 flex items-center justify-center text-[11px] font-bold mt-0.5"
                         style={{
-                          backgroundColor: isActive ? '#0C6DFD' : 'var(--theme-card)',
-                          color: isActive ? '#fff' : 'var(--theme-text-muted)',
+                          backgroundColor: isActive ? 'var(--theme-text)' : 'var(--theme-card)',
+                          color: isActive ? 'var(--theme-bg)' : 'var(--theme-text-muted)',
                           border: isActive ? 'none' : '1px solid var(--theme-card-border)',
                         }}
                       >
@@ -122,7 +122,7 @@ export default function StoryPanel() {
                             className="mt-3 pt-3 text-xs leading-relaxed"
                             style={{
                               color: 'var(--theme-text-secondary)',
-                              borderTop: '1px solid rgba(12,109,253,0.2)',
+                              borderTop: '1px solid var(--theme-card-border)',
                             }}
                           >
                             {chapter.detail}
@@ -145,13 +145,14 @@ export default function StoryPanel() {
                 <span>
                   Chapter {activeChapter} of {chapters.length}
                 </span>
-                <span style={{ color: '#0C6DFD' }}>
+                <span style={{ color: 'var(--theme-text-secondary)' }}>
                   {Math.round((activeChapter / chapters.length) * 100)}% complete
                 </span>
               </div>
               <div className="h-1 rounded-full overflow-hidden" style={{ backgroundColor: 'var(--theme-bar-bg)' }}>
                 <motion.div
-                  className="h-full bg-[#0C6DFD] rounded-full"
+                  className="h-full rounded-full"
+                  style={{ backgroundColor: 'var(--theme-text-secondary)' }}
                   animate={{ width: `${(activeChapter / chapters.length) * 100}%` }}
                   transition={{ duration: 0.3 }}
                 />
@@ -175,7 +176,11 @@ export default function StoryPanel() {
                 <button
                   onClick={nextChapter}
                   disabled={activeChapter === chapters.length}
-                  className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg text-sm font-medium bg-[#0C6DFD] hover:bg-[#0955CC] text-white transition-colors disabled:opacity-40"
+                  className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg text-sm font-medium transition-colors disabled:opacity-40"
+                  style={{
+                    backgroundColor: 'var(--theme-text)',
+                    color: 'var(--theme-bg)',
+                  }}
                 >
                   Next
                   <ChevronRight className="w-3.5 h-3.5" />

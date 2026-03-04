@@ -14,10 +14,10 @@ export default function AssessmentPanel() {
     : 0;
 
   const stats = [
-    { label: 'Total Assessed', value: assessed.length, icon: Cpu, color: '#0C6DFD' },
-    { label: 'Critical Risk', value: critical, icon: AlertTriangle, color: '#EF4444' },
-    { label: 'Firmware Updatable', value: updatable, icon: ShieldAlert, color: '#10B981' },
-    { label: 'Avg Risk Score', value: avgRisk, icon: TrendingUp, color: '#F97316' },
+    { label: 'Total Assessed', value: assessed.length, icon: Cpu },
+    { label: 'Critical Risk', value: critical, icon: AlertTriangle },
+    { label: 'Firmware Updatable', value: updatable, icon: ShieldAlert },
+    { label: 'Avg Risk Score', value: avgRisk, icon: TrendingUp },
   ];
 
   return (
@@ -27,12 +27,12 @@ export default function AssessmentPanel() {
         {stats.map((stat) => (
           <GlassCard key={stat.label} className="p-4" delay={0.05}>
             <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg" style={{ backgroundColor: `${stat.color}20` }}>
-                <stat.icon className="w-4 h-4" style={{ color: stat.color }} />
+              <div className="p-2 rounded-lg" style={{ backgroundColor: 'var(--theme-card-inner)' }}>
+                <stat.icon className="w-4 h-4" style={{ color: 'var(--theme-text-muted)' }} />
               </div>
               <div>
-                <AnimatedNumber value={stat.value} className="text-lg font-bold text-white" />
-                <p className="text-[11px] text-slate-400">{stat.label}</p>
+                <AnimatedNumber value={stat.value} className="text-lg font-bold" />
+                <p className="text-[11px]" style={{ color: 'var(--theme-text-muted)' }}>{stat.label}</p>
               </div>
             </div>
           </GlassCard>
@@ -41,7 +41,7 @@ export default function AssessmentPanel() {
 
       {/* Table */}
       <GlassCard className="p-4" delay={0.1}>
-        <h3 className="text-sm font-semibold text-white mb-3">TrustCore Device Assessment</h3>
+        <h3 className="text-sm font-semibold mb-3" style={{ color: 'var(--theme-text)' }}>TrustCore Device Assessment</h3>
         <AssessmentTable />
       </GlassCard>
     </div>

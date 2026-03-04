@@ -4,10 +4,10 @@ import { industries } from '../../data/industries';
 import type { MigrationPhase } from '../../types';
 
 const phaseColors: Record<MigrationPhase, string> = {
-  discover: '#0C6DFD',
-  test: '#8B5CF6',
-  'deploy-hybrid': '#F97316',
-  'full-pqc': '#10B981',
+  discover: '#A1A1AA',
+  test: '#71717A',
+  'deploy-hybrid': '#E5753C',
+  'full-pqc': '#6EE7B7',
 };
 
 const totalMonths = 60; // 5 years

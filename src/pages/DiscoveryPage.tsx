@@ -27,7 +27,7 @@ export default function DiscoveryPage() {
           </p>
         </div>
         {noCertCount > 0 && (
-          <div className="flex items-center gap-2 px-3 py-2 rounded-xl text-sm" style={{ backgroundColor: 'rgba(239,68,68,0.12)', border: '1px solid rgba(239,68,68,0.3)', color: '#EF4444' }}>
+          <div className="flex items-center gap-2 px-3 py-2 rounded-xl text-sm" style={{ backgroundColor: 'var(--theme-card)', border: '1px solid var(--theme-card-border)', color: 'var(--theme-text-secondary)' }}>
             <span className="text-lg font-bold">{noCertCount.toLocaleString()}</span>
             <span className="text-xs font-medium">devices with<br />no crypto identity</span>
           </div>

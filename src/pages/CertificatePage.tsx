@@ -64,7 +64,7 @@ export default function CertificatePage() {
                 step={1000}
                 value={deviceCount}
                 onChange={(e) => setDeviceCount(Number(e.target.value))}
-                className="w-full accent-[#0C6DFD]"
+                className="w-full accent-zinc-400"
               />
               <div className="flex justify-between text-xs text-slate-500 mt-1">
                 <span>1K</span>
@@ -81,7 +81,7 @@ export default function CertificatePage() {
                 max={100}
                 value={handshakesPerDay}
                 onChange={(e) => setHandshakesPerDay(Number(e.target.value))}
-                className="w-full accent-[#0C6DFD]"
+                className="w-full accent-zinc-400"
               />
               <div className="flex justify-between text-xs text-slate-500 mt-1">
                 <span>1</span>
@@ -97,7 +97,7 @@ export default function CertificatePage() {
               </div>
               <div className="flex justify-between">
                 <span className="text-xs text-slate-400">PQC Daily</span>
-                <span className="text-sm text-[#0C6DFD] font-medium">{formatBytes(pqcDaily)}</span>
+                <span className="text-sm font-medium" style={{ color: 'var(--theme-text)' }}>{formatBytes(pqcDaily)}</span>
               </div>
               <div className="flex justify-between items-center pt-2 border-t border-slate-700/30">
                 <span className="text-xs text-slate-400">Additional Bandwidth</span>

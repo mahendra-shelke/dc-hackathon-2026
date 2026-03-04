@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion';
 import {
   Shield, AlertTriangle, Clock, BookOpen, ArrowRight,
-  ShieldOff, Cpu, Server, ChevronRight, Zap,
+  ShieldOff, Cpu, Server, ChevronRight,
 } from 'lucide-react';
 import { useNavigate } from 'react-router';
 import { deviceGroups } from '../data/devices';
@@ -19,7 +19,6 @@ const WEEKS_REMAINING = Math.floor(
 const problems = [
   {
     icon: ShieldOff,
-    color: '#EF4444',
     headline: 'Devices with no crypto identity',
     subtext: 'No certificate. No key material. No visibility. These are your biggest unknown.',
     stat: deviceGroups.filter((d) => d.certStatus === 'none').reduce((s, d) => s + d.count, 0),
@@ -27,7 +26,6 @@ const problems = [
   },
   {
     icon: AlertTriangle,
-    color: '#F97316',
     headline: 'Critical-risk devices running expired algorithms',
     subtext: 'RSA-2048 and ECDSA are disallowed under CNSA 2.0. Most of your fleet still uses them.',
     stat: null,
@@ -35,7 +33,6 @@ const problems = [
   },
   {
     icon: Clock,
-    color: '#F59E0B',
     headline: 'No clear path to the deadline',
     subtext: 'Jan 1, 2027 is the CNSA 2.0 compliance target. Without a blueprint, you won\'t make it.',
     stat: WEEKS_REMAINING,
@@ -48,21 +45,18 @@ const solutionSteps = [
     step: '01',
     title: 'Discover Everything',
     detail: 'TrustEdge for capable devices. A lightweight Kernel Module for brownfield hardware that can\'t run a full agent. Both phone home with cert status, memory, firmware version — including devices with zero cryptographic identity.',
-    color: '#6366F1',
     route: '/discovery',
   },
   {
     step: '02',
     title: 'Know Your Deadline',
     detail: 'NIST-standardized PQC algorithms (ML-KEM, ML-DSA) are ready. RSA and ECDSA have expiry dates. The Algorithm Intel page shows every classical algorithm\'s sunset date and the right PQC replacement for each device class.',
-    color: '#0C6DFD',
     route: '/algorithms',
   },
   {
     step: '03',
     title: 'Follow the Blueprint',
     detail: 'An ordered, device-aware migration plan tells you exactly what to do first, second, and third — and whether your current velocity will meet the CNSA 2.0 deadline.',
-    color: '#10B981',
     route: '/blueprint',
   },
 ];
@@ -86,17 +80,9 @@ export default function LandingPage() {
     <div className="min-h-screen">
       {/* Hero */}
       <div
-        className="relative px-10 pt-14 pb-12 overflow-hidden"
+        className="relative px-10 pt-14 pb-12"
         style={{ borderBottom: '1px solid var(--theme-card-border)' }}
       >
-        {/* Background glow */}
-        <div className="absolute inset-0 pointer-events-none">
-          <div
-            className="absolute top-[-80px] left-1/2 -translate-x-1/2 w-[600px] h-[300px] rounded-full opacity-10"
-            style={{ background: 'radial-gradient(ellipse, #0C6DFD 0%, transparent 70%)' }}
-          />
-        </div>
-
         <motion.div
           initial={{ opacity: 0, y: -16 }}
           animate={{ opacity: 1, y: 0 }}
@@ -104,17 +90,21 @@ export default function LandingPage() {
           className="relative max-w-4xl"
         >
           <div
-            className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold mb-5"
-            style={{ backgroundColor: 'rgba(239,68,68,0.12)', border: '1px solid rgba(239,68,68,0.3)', color: '#EF4444' }}
+            className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-medium mb-5"
+            style={{
+              backgroundColor: 'var(--theme-card)',
+              border: '1px solid var(--theme-card-border)',
+              color: 'var(--theme-text-secondary)',
+            }}
           >
-            <Zap className="w-3 h-3" />
+            <span className="w-1.5 h-1.5 rounded-full bg-[#E5753C]" />
             CNSA 2.0 Deadline: January 1, 2027 — {WEEKS_REMAINING} weeks away
           </div>
 
           <h1 className="text-4xl font-bold leading-tight mb-4" style={{ color: 'var(--theme-text)' }}>
             Your IoT fleet is not ready<br />for the quantum threat.
           </h1>
-          <p className="text-lg mb-8 max-w-2xl" style={{ color: 'var(--theme-text-secondary)' }}>
+          <p className="text-lg mb-8 max-w-2xl" style={{ color: 'var(--theme-text-muted)' }}>
             Most brownfield devices run weak cryptography. Many have no certificates at all.
             DigiCert's PQC Fleet Platform discovers, assesses, and migrates your entire fleet
             — including devices that can't run a full agent.
@@ -124,7 +114,11 @@ export default function LandingPage() {
             <button
               type="button"
               onClick={startGuidedTour}
-              className="flex items-center gap-2.5 px-6 py-3 bg-[#0C6DFD] hover:bg-[#0955CC] text-white text-sm font-semibold rounded-xl transition-colors"
+              className="flex items-center gap-2.5 px-6 py-3 text-sm font-semibold rounded-xl transition-colors"
+              style={{
+                backgroundColor: 'var(--theme-text)',
+                color: 'var(--theme-bg)',
+              }}
             >
               <BookOpen className="w-4 h-4" />
               Start Guided Tour
@@ -133,11 +127,11 @@ export default function LandingPage() {
             <button
               type="button"
               onClick={() => navigate('/blueprint')}
-              className="flex items-center gap-2.5 px-6 py-3 text-sm font-semibold rounded-xl transition-colors"
+              className="flex items-center gap-2.5 px-6 py-3 text-sm font-medium rounded-xl transition-colors"
               style={{
-                backgroundColor: 'var(--theme-card)',
+                backgroundColor: 'transparent',
                 border: '1px solid var(--theme-card-border)',
-                color: 'var(--theme-text)',
+                color: 'var(--theme-text-secondary)',
               }}
             >
               View Readiness Blueprint
@@ -155,26 +149,21 @@ export default function LandingPage() {
           className="grid grid-cols-4 gap-4"
         >
           {[
-            { label: 'Total Devices', value: total, format: formatNumber, color: '#0C6DFD', icon: Server },
-            { label: 'No Crypto Identity', value: noCert, format: formatNumber, color: '#EF4444', icon: ShieldOff },
-            { label: 'Critical Risk', value: critical, format: formatNumber, color: '#F97316', icon: AlertTriangle },
-            { label: 'Days to CNSA 2.0', value: cnsaDays, format: undefined, color: '#F59E0B', icon: Clock },
-          ].map(({ label, value, format, color, icon: Icon }) => (
+            { label: 'Total Devices', value: total, format: formatNumber, icon: Server },
+            { label: 'No Crypto Identity', value: noCert, format: formatNumber, icon: ShieldOff },
+            { label: 'Critical Risk', value: critical, format: formatNumber, icon: AlertTriangle },
+            { label: 'Days to CNSA 2.0', value: cnsaDays, format: undefined, icon: Clock },
+          ].map(({ label, value, format, icon: Icon }) => (
             <div
               key={label}
               className="rounded-2xl p-5"
               style={{ backgroundColor: 'var(--theme-card)', border: '1px solid var(--theme-card-border)' }}
             >
               <div className="flex items-center gap-2 mb-3">
-                <div
-                  className="w-7 h-7 rounded-lg flex items-center justify-center"
-                  style={{ backgroundColor: color + '20' }}
-                >
-                  <Icon className="w-3.5 h-3.5" style={{ color }} />
-                </div>
+                <Icon className="w-3.5 h-3.5" style={{ color: 'var(--theme-text-muted)' }} />
                 <span className="text-xs" style={{ color: 'var(--theme-text-muted)' }}>{label}</span>
               </div>
-              <span className="text-3xl font-bold" style={{ color }}>
+              <span className="text-3xl font-bold" style={{ color: 'var(--theme-text)' }}>
                 <AnimatedNumber value={value} format={format} className="" />
               </span>
             </div>
@@ -198,14 +187,14 @@ export default function LandingPage() {
                 Run "Simulate Migration" in the sidebar to see the fleet progress
               </div>
             </div>
-            <div className="text-3xl font-bold" style={{ color: readinessPct > 50 ? '#10B981' : '#EF4444' }}>
+            <div className="text-3xl font-bold" style={{ color: 'var(--theme-text)' }}>
               {readinessPct}%
             </div>
           </div>
-          <div className="h-3 rounded-full overflow-hidden" style={{ backgroundColor: 'var(--theme-bar-bg)' }}>
+          <div className="h-2 rounded-full overflow-hidden" style={{ backgroundColor: 'var(--theme-bar-bg)' }}>
             <motion.div
               className="h-full rounded-full"
-              style={{ backgroundColor: readinessPct > 50 ? '#10B981' : '#EF4444' }}
+              style={{ backgroundColor: 'var(--theme-text-secondary)' }}
               initial={{ width: 0 }}
               animate={{ width: `${readinessPct}%` }}
               transition={{ duration: 1.2, ease: 'easeOut', delay: 0.4 }}
@@ -238,14 +227,12 @@ export default function LandingPage() {
                 className="rounded-2xl p-5"
                 style={{
                   backgroundColor: 'var(--theme-card)',
-                  border: `1px solid ${p.color}30`,
+                  border: '1px solid var(--theme-card-border)',
                 }}
               >
-                <div
-                  className="w-10 h-10 rounded-xl flex items-center justify-center mb-4"
-                  style={{ backgroundColor: p.color + '18' }}
-                >
-                  <p.icon className="w-5 h-5" style={{ color: p.color }} />
+                <div className="flex items-center gap-2 mb-4">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#E5753C]" />
+                  <p.icon className="w-4 h-4" style={{ color: 'var(--theme-text-muted)' }} />
                 </div>
                 <div className="text-sm font-semibold mb-2" style={{ color: 'var(--theme-text)' }}>
                   {p.headline}
@@ -256,7 +243,7 @@ export default function LandingPage() {
                 {p.stat !== null && (
                   <div
                     className="text-2xl font-bold"
-                    style={{ color: p.color }}
+                    style={{ color: 'var(--theme-text)' }}
                   >
                     {p.stat.toLocaleString()}
                     <span className="text-xs font-normal ml-2" style={{ color: 'var(--theme-text-dim)' }}>
@@ -294,19 +281,19 @@ export default function LandingPage() {
                 className="text-left rounded-2xl p-5 group transition-all"
                 style={{
                   backgroundColor: 'var(--theme-card)',
-                  border: `1px solid ${s.color}25`,
+                  border: '1px solid var(--theme-card-border)',
                 }}
               >
                 <div className="flex items-start justify-between mb-3">
                   <span
-                    className="text-3xl font-black opacity-20"
-                    style={{ color: s.color }}
+                    className="text-3xl font-black"
+                    style={{ color: 'var(--theme-text-dim)' }}
                   >
                     {s.step}
                   </span>
                   <ChevronRight
                     className="w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity"
-                    style={{ color: s.color }}
+                    style={{ color: 'var(--theme-text-muted)' }}
                   />
                 </div>
                 <div className="text-sm font-bold mb-2" style={{ color: 'var(--theme-text)' }}>
@@ -316,10 +303,10 @@ export default function LandingPage() {
                   {s.detail}
                 </div>
                 <div
-                  className="mt-4 text-[11px] font-semibold"
-                  style={{ color: s.color }}
+                  className="mt-4 text-[11px] font-semibold flex items-center gap-1"
+                  style={{ color: '#E5753C' }}
                 >
-                  Explore →
+                  Explore <ArrowRight className="w-3 h-3" />
                 </div>
               </motion.button>
             ))}
@@ -333,13 +320,16 @@ export default function LandingPage() {
           transition={{ delay: 0.7 }}
           className="rounded-2xl p-8 flex items-center justify-between"
           style={{
-            background: 'linear-gradient(135deg, rgba(12,109,253,0.12) 0%, rgba(99,102,241,0.08) 100%)',
-            border: '1px solid rgba(12,109,253,0.25)',
+            backgroundColor: 'var(--theme-card)',
+            border: '1px solid var(--theme-card-border)',
           }}
         >
           <div className="flex items-center gap-4">
-            <div className="w-12 h-12 rounded-2xl bg-[#0C6DFD]/20 flex items-center justify-center flex-shrink-0">
-              <Shield className="w-6 h-6 text-[#0C6DFD]" />
+            <div
+              className="w-12 h-12 rounded-2xl flex items-center justify-center flex-shrink-0"
+              style={{ backgroundColor: 'var(--theme-card-inner)' }}
+            >
+              <Shield className="w-6 h-6" style={{ color: 'var(--theme-text-muted)' }} />
             </div>
             <div>
               <div className="text-base font-bold mb-1" style={{ color: 'var(--theme-text)' }}>
@@ -353,7 +343,11 @@ export default function LandingPage() {
           <button
             type="button"
             onClick={startGuidedTour}
-            className="flex-shrink-0 flex items-center gap-2.5 px-6 py-3 bg-[#0C6DFD] hover:bg-[#0955CC] text-white text-sm font-semibold rounded-xl transition-colors ml-6"
+            className="flex-shrink-0 flex items-center gap-2.5 px-6 py-3 text-sm font-semibold rounded-xl transition-colors ml-6"
+            style={{
+              backgroundColor: 'var(--theme-text)',
+              color: 'var(--theme-bg)',
+            }}
           >
             <BookOpen className="w-4 h-4" />
             Start Guided Tour
@@ -370,7 +364,6 @@ export default function LandingPage() {
           {[
             {
               icon: Shield,
-              color: '#0C6DFD',
               title: 'TrustEdge Agent',
               tag: 'Full-capability devices',
               points: ['Certificate lifecycle — issue, renew, revoke', 'Full PQC + hybrid cert deployment', 'Policy enforcement & compliance attestation'],
@@ -378,34 +371,33 @@ export default function LandingPage() {
             },
             {
               icon: Cpu,
-              color: '#F97316',
               title: 'Kernel Module + SDK',
               tag: 'Brownfield IoT — constrained hardware',
               points: ['Telemetry-only: cert status, RAM, CPU, firmware hash', 'Runs on ≥ 8KB RAM — no OS requirement', 'SDK in Python, C, Go — embed into existing firmware'],
               req: 'Works on UART / BLE / NB-IoT',
             },
-          ].map(({ icon: Icon, color, title, tag, points, req }) => (
+          ].map(({ icon: Icon, title, tag, points, req }) => (
             <div
               key={title}
               className="rounded-2xl p-5"
-              style={{ backgroundColor: 'var(--theme-card)', border: `1px solid ${color}30` }}
+              style={{ backgroundColor: 'var(--theme-card)', border: '1px solid var(--theme-card-border)' }}
             >
               <div className="flex items-center gap-3 mb-4">
                 <div
                   className="w-9 h-9 rounded-xl flex items-center justify-center"
-                  style={{ backgroundColor: color + '18' }}
+                  style={{ backgroundColor: 'var(--theme-card-inner)' }}
                 >
-                  <Icon className="w-4.5 h-4.5" style={{ color }} />
+                  <Icon className="w-4 h-4" style={{ color: 'var(--theme-text-muted)' }} />
                 </div>
                 <div>
                   <div className="text-sm font-bold" style={{ color: 'var(--theme-text)' }}>{title}</div>
-                  <div className="text-[11px]" style={{ color }}>{tag}</div>
+                  <div className="text-[11px]" style={{ color: 'var(--theme-text-muted)' }}>{tag}</div>
                 </div>
               </div>
               <ul className="space-y-1.5 mb-3">
                 {points.map((p) => (
                   <li key={p} className="flex items-start gap-2 text-xs" style={{ color: 'var(--theme-text-secondary)' }}>
-                    <span style={{ color }} className="mt-0.5 text-[10px]">✓</span>
+                    <span className="mt-0.5 text-[10px]" style={{ color: '#E5753C' }}>✓</span>
                     {p}
                   </li>
                 ))}

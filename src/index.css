@@ -2,8 +2,8 @@
 
 @theme {
   --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
-  --color-digicert: #0C6DFD;
-  --color-digicert-dark: #0955CC;
+  --color-digicert: #A1A1AA;
+  --color-digicert-dark: #71717A;
   --color-risk-critical: #EF4444;
   --color-risk-high: #F97316;
   --color-risk-medium: #EAB308;
@@ -40,68 +40,25 @@
   color-scheme: dark;
 }
 
-[data-theme="charcoal-gradient"] {
-  /* Graphite — warm neutral dark */
-  --theme-bg: #111110;
-  --theme-bg-gradient: none;
-  --theme-sidebar: #141412;
-  --theme-sidebar-border: rgba(255, 255, 255, 0.06);
-  --theme-card: #1A1A18;
-  --theme-card-hover: #202020;
-  --theme-card-border: rgba(255, 255, 255, 0.08);
-  --theme-card-inner: rgba(255, 255, 255, 0.04);
-  --theme-text: #F0EFED;
-  --theme-text-secondary: #9E9D9A;
-  --theme-text-muted: #6E6D6A;
-  --theme-text-dim: #4E4D4A;
-  --theme-input-bg: #202020;
-  --theme-input-border: rgba(255, 255, 255, 0.10);
-  --theme-bar-bg: #242422;
-  --theme-modal-bg: #1A1A18;
-  --theme-terminal-bg: #141412;
-  color-scheme: dark;
-}
-
-[data-theme="digicert-blue"] {
-  /* DigiCert — brand dark blue */
-  --theme-bg: #080E1C;
-  --theme-bg-gradient: none;
-  --theme-sidebar: #0A1020;
-  --theme-sidebar-border: rgba(12, 109, 253, 0.15);
-  --theme-card: #0E1628;
-  --theme-card-hover: #141E34;
-  --theme-card-border: rgba(12, 109, 253, 0.12);
-  --theme-card-inner: rgba(12, 109, 253, 0.05);
-  --theme-text: #EEF2FF;
-  --theme-text-secondary: #8FA3C8;
-  --theme-text-muted: #5A6E8E;
-  --theme-text-dim: #3A4E6E;
-  --theme-input-bg: #141E34;
-  --theme-input-border: rgba(12, 109, 253, 0.2);
-  --theme-bar-bg: #1A2640;
-  --theme-modal-bg: #0E1628;
-  --theme-terminal-bg: #0A1020;
-  color-scheme: dark;
-}
-
 [data-theme="light"] {
-  --theme-bg: #f8fafc;
+  /* Light — clean white, subtle borders, no color noise */
+  --theme-bg: #FAFAFA;
   --theme-bg-gradient: none;
-  --theme-sidebar: #ffffff;
-  --theme-sidebar-border: #e2e8f0;
-  --theme-card: rgba(255, 255, 255, 0.8);
-  --theme-card-hover: rgba(255, 255, 255, 0.95);
-  --theme-card-border: #e2e8f0;
-  --theme-card-inner: rgba(241, 245, 249, 0.8);
-  --theme-text: #0f172a;
-  --theme-text-secondary: #475569;
-  --theme-text-muted: #64748b;
-  --theme-text-dim: #94a3b8;
-  --theme-input-bg: #f1f5f9;
-  --theme-input-border: #e2e8f0;
-  --theme-bar-bg: #e2e8f0;
-  --theme-modal-bg: #ffffff;
-  --theme-terminal-bg: #1e293b;
+  --theme-sidebar: #FFFFFF;
+  --theme-sidebar-border: rgba(0, 0, 0, 0.08);
+  --theme-card: #FFFFFF;
+  --theme-card-hover: #F5F5F5;
+  --theme-card-border: rgba(0, 0, 0, 0.08);
+  --theme-card-inner: #F5F5F5;
+  --theme-text: #1A1A1A;
+  --theme-text-secondary: #6B6B73;
+  --theme-text-muted: #9B9BA3;
+  --theme-text-dim: #C4C4CC;
+  --theme-input-bg: #F5F5F5;
+  --theme-input-border: rgba(0, 0, 0, 0.10);
+  --theme-bar-bg: #EBEBEB;
+  --theme-modal-bg: #FFFFFF;
+  --theme-terminal-bg: #1A1A1A;
   color-scheme: light;
 }
 
@@ -192,4 +149,32 @@
 
 .animate-pulse-glow {
   animation: pulse-glow 2s ease-in-out infinite;
+}
+
+/* === KernelAgentPanel === */
+.agent-icon-circle {
+  background-color: var(--theme-card-inner);
+  border: 2px solid var(--theme-card-border);
+}
+
+.agent-no-cert-label {
+  color: #E5753C;
+}
+
+/* === AlgorithmPage === */
+.algo-pill-dot {
+  background-color: var(--theme-text-muted);
+}
+
+/* === BlueprintPage === */
+.blueprint-velocity-strong {
+  color: var(--theme-text);
+}
+
+.blueprint-agent-icon-bg {
+  background-color: var(--theme-card-inner);
+}
+
+.blueprint-kernel-icon-bg {
+  background-color: rgba(229, 117, 60, 0.10);
 }

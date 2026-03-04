@@ -25,7 +25,7 @@ export default function ScanVisualization() {
         {isScanning && (
           <motion.line
             x1={150} y1={150} x2={150} y2={30}
-            stroke="rgba(12,109,253,0.5)"
+            stroke="rgba(161,161,170,0.4)"
             strokeWidth={2}
             animate={{ rotate: 360 }}
             transition={{ duration: 3, repeat: Infinity, ease: 'linear' }}
@@ -38,8 +38,8 @@ export default function ScanVisualization() {
           <>
             <defs>
               <linearGradient id="sweep-grad" x1="0" y1="0" x2="1" y2="0">
-                <stop offset="0%" stopColor="rgba(12,109,253,0)" />
-                <stop offset="100%" stopColor="rgba(12,109,253,0.15)" />
+                <stop offset="0%" stopColor="rgba(161,161,170,0)" />
+                <stop offset="100%" stopColor="rgba(161,161,170,0.12)" />
               </linearGradient>
             </defs>
             <motion.path
@@ -70,20 +70,20 @@ export default function ScanVisualization() {
               initial={{ scale: 0, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               transition={{ duration: 0.3, delay: 0.05 }}
-              className="fill-[#0C6DFD]"
+              className="fill-current" style={{ color: 'var(--theme-text-secondary)' }}
             />
           );
         })}
 
         {/* Center circle with count */}
-        <circle cx={150} cy={150} r={24} fill="rgba(15,23,42,0.8)" stroke="rgba(12,109,253,0.3)" strokeWidth={1.5} />
+        <circle cx={150} cy={150} r={24} fill="rgba(15,23,42,0.8)" stroke="rgba(161,161,170,0.2)" strokeWidth={1.5} />
       </svg>
 
       {/* Center count overlay */}
       <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
         <div className="text-center">
-          <AnimatedNumber value={deviceCount} className="text-2xl font-bold text-[#0C6DFD]" />
-          <p className="text-[10px] text-slate-400 mt-0.5">devices</p>
+          <AnimatedNumber value={deviceCount} className="text-2xl font-bold" />
+          <p className="text-[10px] mt-0.5" style={{ color: 'var(--theme-text-muted)' }}>devices</p>
         </div>
       </div>
     </div>

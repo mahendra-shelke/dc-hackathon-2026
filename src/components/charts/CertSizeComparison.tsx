@@ -2,7 +2,7 @@ import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from 
 import { certComparisons } from '../../data/certificates';
 import { formatBytes } from '../../utils';
 
-const colors = ['#64748b', '#64748b', '#0C6DFD', '#3B82F6', '#6366F1', '#8B5CF6'];
+const colors = ['#64748b', '#64748b', '#A1A1AA', '#3B82F6', '#6366F1', '#8B5CF6'];
 
 export function CertSizeBars() {
   const data = certComparisons.map((c) => ({
@@ -103,7 +103,7 @@ export function ChainStackSVG() {
     <svg viewBox="0 0 300 250" className="w-full max-w-sm mx-auto">
       <text x="150" y="16" textAnchor="middle" fill="#e2e8f0" fontSize="13" fontWeight="600">3-Certificate Chain Comparison</text>
       {renderStack(ecdsa, 50, 'ECDSA P-256', '#64748b')}
-      {renderStack(mlDsa65, 190, 'ML-DSA-65', '#0C6DFD')}
+      {renderStack(mlDsa65, 190, 'ML-DSA-65', '#A1A1AA')}
       {/* Size multiplier */}
       <text x="150" y="160" textAnchor="middle" fill="#EAB308" fontSize="16" fontWeight="bold">
         {(mlDsa65.chainSize / ecdsa.chainSize).toFixed(0)}x larger
@@ -138,7 +138,7 @@ export function HandshakeComparison() {
             {/* Classical bar */}
             <rect x="95" y={y} width={classW} height={14} rx={2} fill="#64748b" opacity={0.7} />
             {/* PQC bar */}
-            <rect x="95" y={y + 18} width={pqcW} height={14} rx={2} fill="#0C6DFD" opacity={0.8} />
+            <rect x="95" y={y + 18} width={pqcW} height={14} rx={2} fill="#A1A1AA" opacity={0.8} />
           </g>
         );
       })}
@@ -146,7 +146,7 @@ export function HandshakeComparison() {
       <g transform="translate(95, 215)">
         <rect width={10} height={10} rx={2} fill="#64748b" opacity={0.7} />
         <text x={16} y={9} fill="#94a3b8" fontSize="10">Classical (ECDSA)</text>
-        <rect x={140} width={10} height={10} rx={2} fill="#0C6DFD" opacity={0.8} />
+        <rect x={140} width={10} height={10} rx={2} fill="#A1A1AA" opacity={0.8} />
         <text x={156} y={9} fill="#94a3b8" fontSize="10">PQC (ML-DSA-65)</text>
       </g>
     </svg>

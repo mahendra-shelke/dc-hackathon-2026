@@ -12,16 +12,17 @@ const deviceClasses: { id: DeviceClass; label: string; description: string }[] =
   { id: 'server-class', label: 'Server-Class', description: 'x86/ARM server, 4GB+ RAM' },
 ];
 
-const SuitabilityIcon = ({ level }: { level: 'good' | 'moderate' | 'poor' }) => {
-  if (level === 'good') return <Check className="w-4 h-4 text-emerald-400" />;
-  if (level === 'moderate') return <AlertTriangle className="w-4 h-4 text-yellow-400" />;
-  return <XIcon className="w-4 h-4 text-red-400" />;
-};
+const suitConfig = {
+  good:     { color: 'var(--theme-text)',      bg: 'rgba(241,241,243,0.08)', tip: 'Good fit — runs efficiently on this device class' },
+  moderate: { color: '#E5753C',                bg: 'rgba(229,117,60,0.08)',  tip: 'Moderate — works but may strain resources' },
+  poor:     { color: 'var(--theme-text-dim)',   bg: 'rgba(196,196,204,0.05)', tip: 'Poor fit — exceeds device capabilities' },
+} as const;
 
-const suitBg = (level: string) => {
-  if (level === 'good') return 'bg-emerald-500/10 hover:bg-emerald-500/20';
-  if (level === 'moderate') return 'bg-yellow-500/10 hover:bg-yellow-500/20';
-  return 'bg-red-500/10 hover:bg-red-500/20';
+const SuitabilityIcon = ({ level }: { level: 'good' | 'moderate' | 'poor' }) => {
+  const cfg = suitConfig[level];
+  if (level === 'good') return <Check className="w-4 h-4" style={{ color: cfg.color }} />;
+  if (level === 'moderate') return <AlertTriangle className="w-4 h-4" style={{ color: cfg.color }} />;
+  return <XIcon className="w-4 h-4" style={{ color: cfg.color }} />;
 };
 
 export default function AlgorithmMatrix() {
@@ -68,7 +69,9 @@ export default function AlgorithmMatrix() {
                     <td key={alg.id} className="p-2 text-center">
                       <button
                         onClick={() => setSelected(alg)}
-                        className={`inline-flex items-center justify-center w-10 h-10 rounded-lg transition-colors ${suitBg(suit)}`}
+                        title={`${alg.name} on ${dc.label}: ${suitConfig[suit].tip}`}
+                        className="inline-flex items-center justify-center w-10 h-10 rounded-lg transition-colors"
+                        style={{ backgroundColor: suitConfig[suit].bg }}
                       >
                         <SuitabilityIcon level={suit} />
                       </button>
@@ -83,14 +86,14 @@ export default function AlgorithmMatrix() {
 
       {/* Legend */}
       <div className="flex items-center gap-6 mt-4 pt-4 border-t border-slate-700/30">
-        <div className="flex items-center gap-2 text-xs text-slate-400">
-          <Check className="w-3.5 h-3.5 text-emerald-400" /> Good fit
+        <div className="flex items-center gap-2 text-xs" style={{ color: 'var(--theme-text-muted)' }} title={suitConfig.good.tip}>
+          <Check className="w-3.5 h-3.5" style={{ color: 'var(--theme-text)' }} /> Good fit
         </div>
-        <div className="flex items-center gap-2 text-xs text-slate-400">
-          <AlertTriangle className="w-3.5 h-3.5 text-yellow-400" /> Moderate
+        <div className="flex items-center gap-2 text-xs" style={{ color: 'var(--theme-text-muted)' }} title={suitConfig.moderate.tip}>
+          <AlertTriangle className="w-3.5 h-3.5" style={{ color: '#E5753C' }} /> Moderate
         </div>
-        <div className="flex items-center gap-2 text-xs text-slate-400">
-          <XIcon className="w-3.5 h-3.5 text-red-400" /> Poor fit
+        <div className="flex items-center gap-2 text-xs" style={{ color: 'var(--theme-text-muted)' }} title={suitConfig.poor.tip}>
+          <XIcon className="w-3.5 h-3.5" style={{ color: 'var(--theme-text-dim)' }} /> Poor fit
         </div>
       </div>
 
@@ -109,7 +112,8 @@ export default function AlgorithmMatrix() {
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
               onClick={(e) => e.stopPropagation()}
-              className="bg-slate-900 border border-slate-700/50 rounded-2xl p-6 max-w-md w-full mx-4 shadow-2xl"
+              className="rounded-2xl p-6 max-w-md w-full mx-4 shadow-2xl"
+              style={{ backgroundColor: 'var(--theme-modal-bg)', border: '1px solid var(--theme-card-border)' }}
             >
               <div className="flex items-start justify-between mb-4">
                 <div>

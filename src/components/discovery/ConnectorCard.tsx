@@ -85,7 +85,8 @@ export default function ConnectorCard({ connector, onConnect, onDisconnect }: Pr
                   type="text"
                   value={connector.endpoint}
                   readOnly
-                  className="w-full mt-1 bg-slate-800/60 border border-slate-700/50 rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none focus:border-[#0C6DFD]/50"
+                  className="w-full mt-1 rounded-lg px-3 py-1.5 text-xs focus:outline-none"
+                  style={{ backgroundColor: 'var(--theme-input-bg)', border: '1px solid var(--theme-input-border)', color: 'var(--theme-text)' }}
                 />
               </div>
               <div>
@@ -111,7 +112,8 @@ export default function ConnectorCard({ connector, onConnect, onDisconnect }: Pr
           <button
             onClick={() => onConnect(connector.id)}
             disabled={isConnecting}
-            className="w-full flex items-center justify-center gap-2 px-3 py-2 bg-[#0C6DFD] hover:bg-[#0955CC] disabled:opacity-50 disabled:cursor-not-allowed text-white text-xs font-medium rounded-lg transition-colors"
+            className="w-full flex items-center justify-center gap-2 px-3 py-2 disabled:opacity-50 disabled:cursor-not-allowed text-xs font-medium rounded-lg transition-colors"
+            style={{ backgroundColor: 'var(--theme-text)', color: 'var(--theme-bg)' }}
           >
             <Plug className="w-3.5 h-3.5" />
             {isConnecting ? 'Connecting...' : 'Connect'}

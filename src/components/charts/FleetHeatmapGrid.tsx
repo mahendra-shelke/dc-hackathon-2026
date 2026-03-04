@@ -79,7 +79,7 @@ export default function FleetHeatmapGrid() {
               style={{ backgroundColor: cellColor(device), boxShadow: `0 0 8px ${cellColor(device)}60` }}
             />
             {device.id.startsWith('disc-') && (
-              <span className="absolute top-3 left-3 px-1.5 py-0.5 text-[9px] font-bold rounded bg-[#0C6DFD]/20 text-[#0C6DFD] border border-[#0C6DFD]/30 uppercase tracking-wider">
+              <span className="absolute top-3 left-3 px-1.5 py-0.5 text-[9px] font-bold rounded uppercase tracking-wider" style={{ backgroundColor: 'var(--theme-card-inner)', color: 'var(--theme-text-secondary)', border: '1px solid var(--theme-card-border)' }}>
                 New
               </span>
             )}

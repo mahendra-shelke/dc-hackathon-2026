@@ -21,7 +21,8 @@ export default function FilterBar({ filters }: Props) {
           <select
             value={filter.value}
             onChange={(e) => filter.onChange(e.target.value)}
-            className="bg-slate-800/60 border border-slate-700/50 rounded-lg px-3 py-1.5 text-sm text-white focus:outline-none focus:border-[#0C6DFD]/50 appearance-none cursor-pointer"
+            className="rounded-lg px-3 py-1.5 text-sm focus:outline-none appearance-none cursor-pointer"
+            style={{ backgroundColor: 'var(--theme-input-bg)', border: '1px solid var(--theme-input-border)', color: 'var(--theme-text)' }}
           >
             {filter.options.map((opt) => (
               <option key={opt.value} value={opt.value}>{opt.label}</option>

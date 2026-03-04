@@ -24,22 +24,54 @@ function daysUntil(year: number | null): number | null {
 function statusIcon(status: ClassicalAlgoDeprecation['status']) {
   switch (status) {
     case 'active':
-      return <CheckCircle2 className="w-4 h-4 text-emerald-400" />;
+      return <CheckCircle2 className="w-4 h-4" style={{ color: 'var(--theme-text-secondary)' }} />;
     case 'deprecated':
-      return <AlertTriangle className="w-4 h-4 text-amber-400" />;
+      return <AlertTriangle className="w-4 h-4" style={{ color: '#E5753C' }} />;
     case 'disallowed':
-      return <XCircle className="w-4 h-4 text-red-400" />;
+      return <XCircle className="w-4 h-4" style={{ color: 'var(--theme-text-muted)' }} />;
     case 'sunset':
-      return <XCircle className="w-4 h-4 text-red-600" />;
+      return <XCircle className="w-4 h-4" style={{ color: 'var(--theme-text-dim)' }} />;
   }
 }
 
 function statusColor(status: ClassicalAlgoDeprecation['status']): string {
   switch (status) {
-    case 'active': return '#10B981';
-    case 'deprecated': return '#F59E0B';
-    case 'disallowed': return '#EF4444';
-    case 'sunset': return '#7F1D1D';
+    case 'active':     return 'var(--theme-text-secondary)';
+    case 'deprecated': return '#E5753C';
+    case 'disallowed': return 'var(--theme-text-muted)';
+    case 'sunset':     return 'var(--theme-text-dim)';
+  }
+}
+
+/**
+ * Returns a semi-transparent background and border color for a timeline bar
+ * without relying on hex-alpha string concatenation (which breaks CSS vars).
+ */
+function statusBarStyle(status: ClassicalAlgoDeprecation['status']): {
+  backgroundColor: string;
+  border: string;
+} {
+  switch (status) {
+    case 'active':
+      return {
+        backgroundColor: 'rgba(160, 160, 168, 0.14)',
+        border: '1px solid rgba(160, 160, 168, 0.22)',
+      };
+    case 'deprecated':
+      return {
+        backgroundColor: 'rgba(229, 117, 60, 0.12)',
+        border: '1px solid rgba(229, 117, 60, 0.22)',
+      };
+    case 'disallowed':
+      return {
+        backgroundColor: 'rgba(108, 108, 116, 0.14)',
+        border: '1px solid rgba(108, 108, 116, 0.22)',
+      };
+    case 'sunset':
+      return {
+        backgroundColor: 'rgba(76, 76, 84, 0.14)',
+        border: '1px solid rgba(76, 76, 84, 0.22)',
+      };
   }
 }
 
@@ -61,7 +93,7 @@ function DeprecationTimeline() {
       {/* CNSA Key Milestones */}
       <div className="rounded-xl p-5" style={{ backgroundColor: 'var(--theme-card)', border: '1px solid var(--theme-card-border)' }}>
         <div className="flex items-center gap-2 mb-4">
-          <Clock className="w-4 h-4 text-[#0C6DFD]" />
+          <Clock className="w-4 h-4" style={{ color: 'var(--theme-text-secondary)' }} />
           <h3 className="text-sm font-semibold" style={{ color: 'var(--theme-text)' }}>
             NIST / CNSA 2.0 Key Dates
           </h3>
@@ -71,10 +103,14 @@ function DeprecationTimeline() {
             <div
               key={m.year}
               className="flex items-center gap-2 text-xs px-3 py-1.5 rounded-full"
-              style={{ backgroundColor: m.color + '18', border: `1px solid ${m.color}40`, color: m.color }}
+              style={{
+                backgroundColor: 'var(--theme-card-inner)',
+                border: '1px solid var(--theme-card-border)',
+                color: 'var(--theme-text-secondary)',
+              }}
             >
-              <span className="font-bold">{m.year}</span>
-              <span style={{ color: 'var(--theme-text-secondary)' }}>{m.label}</span>
+              <span className="font-bold" style={{ color: 'var(--theme-text)' }}>{m.year}</span>
+              <span>{m.label}</span>
             </div>
           ))}
         </div>
@@ -96,23 +132,23 @@ function DeprecationTimeline() {
           <div className="h-0.5 relative" style={{ backgroundColor: 'var(--theme-card-border)' }}>
             {/* Today marker */}
             <div
-              className="absolute top-[-4px] w-0.5 h-3 bg-[#0C6DFD]"
-              style={{ left: `${todayPercent}%` }}
+              className="absolute top-[-4px] w-0.5 h-3"
+              style={{ left: `${todayPercent}%`, backgroundColor: 'var(--theme-text-secondary)' }}
             />
             <div
-              className="absolute top-[-18px] text-[9px] font-semibold text-[#0C6DFD] -translate-x-1/2"
-              style={{ left: `${todayPercent}%` }}
+              className="absolute top-[-18px] text-[9px] font-semibold -translate-x-1/2"
+              style={{ left: `${todayPercent}%`, color: 'var(--theme-text-secondary)' }}
             >
               Today
             </div>
-            {/* CNSA 2027 marker */}
+            {/* CNSA 2027 deadline marker */}
             <div
-              className="absolute top-[-4px] w-0.5 h-3 bg-red-500"
-              style={{ left: `${yearToPercent(2027)}%` }}
+              className="absolute top-[-4px] w-0.5 h-3"
+              style={{ left: `${yearToPercent(2027)}%`, backgroundColor: '#E5753C' }}
             />
             <div
-              className="absolute top-[8px] text-[9px] font-semibold text-red-400 -translate-x-1/2"
-              style={{ left: `${yearToPercent(2027)}%` }}
+              className="absolute top-[8px] text-[9px] font-semibold -translate-x-1/2"
+              style={{ left: `${yearToPercent(2027)}%`, color: '#E5753C' }}
             >
               Deadline
             </div>
@@ -124,6 +160,7 @@ function DeprecationTimeline() {
           {classicalAlgoDeprecations.map((algo) => {
             const days = daysUntil(algo.disallowedYear);
             const color = statusColor(algo.status);
+            const barStyle = statusBarStyle(algo.status);
 
             // Active bar spans from start to disallowed/sunset
             const barEnd = algo.sunsetYear ?? algo.disallowedYear ?? TIMELINE_END;
@@ -153,8 +190,7 @@ function DeprecationTimeline() {
                     style={{
                       left: `${barLeft}%`,
                       width: `${barWidth}%`,
-                      backgroundColor: color + '35',
-                      border: `1px solid ${color}50`,
+                      ...barStyle,
                     }}
                   />
                   {/* Disallowed marker */}
@@ -180,7 +216,7 @@ function DeprecationTimeline() {
                       </div>
                     )}
                     {days === 0 && (
-                      <div className="text-[9px] text-red-400">Now</div>
+                      <div className="text-[9px]" style={{ color: '#E5753C' }}>Now</div>
                     )}
                   </div>
                 </div>
@@ -278,8 +314,8 @@ function DeviceAdvisor() {
               whileTap={{ scale: 0.99 }}
               className="text-left rounded-2xl p-5 transition-all"
               style={{
-                backgroundColor: isSelected ? advisory.color + '12' : 'var(--theme-card)',
-                border: `1px solid ${isSelected ? advisory.color + '50' : 'var(--theme-card-border)'}`,
+                backgroundColor: isSelected ? 'var(--theme-card-hover)' : 'var(--theme-card)',
+                border: `1px solid ${isSelected ? 'var(--theme-text-muted)' : 'var(--theme-card-border)'}`,
               }}
             >
               <div className="flex items-start justify-between gap-2 mb-3">
@@ -296,9 +332,9 @@ function DeviceAdvisor() {
                 </div>
                 <div
                   className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
-                  style={{ backgroundColor: advisory.color + '20' }}
+                  style={{ backgroundColor: 'var(--theme-card-inner)' }}
                 >
-                  <Cpu className="w-4 h-4" style={{ color: advisory.color }} />
+                  <Cpu className="w-4 h-4" style={{ color: 'var(--theme-text-secondary)' }} />
                 </div>
               </div>
 
@@ -315,7 +351,7 @@ function DeviceAdvisor() {
                   <div className="text-[10px] uppercase tracking-wider mb-1" style={{ color: 'var(--theme-text-dim)' }}>
                     Key Exchange
                   </div>
-                  <div className="text-xs font-bold" style={{ color: advisory.color }}>
+                  <div className="text-xs font-bold" style={{ color: 'var(--theme-text)' }}>
                     {advisory.recommendedKem}
                   </div>
                 </div>
@@ -326,7 +362,7 @@ function DeviceAdvisor() {
                   <div className="text-[10px] uppercase tracking-wider mb-1" style={{ color: 'var(--theme-text-dim)' }}>
                     Signatures
                   </div>
-                  <div className="text-xs font-bold" style={{ color: advisory.color }}>
+                  <div className="text-xs font-bold" style={{ color: 'var(--theme-text)' }}>
                     {advisory.recommendedSig}
                   </div>
                 </div>
@@ -344,7 +380,7 @@ function DeviceAdvisor() {
       <div className="rounded-xl overflow-hidden" style={{ backgroundColor: 'var(--theme-card)', border: '1px solid var(--theme-card-border)' }}>
         <div className="px-5 py-4" style={{ borderBottom: '1px solid var(--theme-card-border)' }}>
           <div className="flex items-center gap-2">
-            <Shield className="w-4 h-4 text-[#0C6DFD]" />
+            <Shield className="w-4 h-4" style={{ color: 'var(--theme-text-secondary)' }} />
             <h3 className="text-sm font-semibold" style={{ color: 'var(--theme-text)' }}>
               Algorithm Selection Summary
             </h3>
@@ -371,13 +407,17 @@ function DeviceAdvisor() {
                   key={a.deviceClass}
                   style={{
                     borderBottom: '1px solid var(--theme-card-border)',
-                    backgroundColor: selected === a.deviceClass ? a.color + '08' : 'transparent',
+                    backgroundColor: selected === a.deviceClass ? 'var(--theme-card-inner)' : 'transparent',
                   }}
                 >
                   <td className="px-4 py-3">
                     <span
                       className="text-xs font-semibold px-2 py-0.5 rounded"
-                      style={{ backgroundColor: a.color + '18', color: a.color }}
+                      style={{
+                        backgroundColor: 'var(--theme-card-inner)',
+                        color: 'var(--theme-text-secondary)',
+                        border: '1px solid var(--theme-card-border)',
+                      }}
                     >
                       {a.label}
                     </span>
@@ -388,10 +428,10 @@ function DeviceAdvisor() {
                   <td className="px-4 py-3 text-xs" style={{ color: 'var(--theme-text-secondary)' }}>
                     {a.exampleDevices}
                   </td>
-                  <td className="px-4 py-3 text-xs font-semibold" style={{ color: a.color }}>
+                  <td className="px-4 py-3 text-xs font-semibold" style={{ color: 'var(--theme-text)' }}>
                     {a.recommendedKem}
                   </td>
-                  <td className="px-4 py-3 text-xs font-semibold" style={{ color: a.color }}>
+                  <td className="px-4 py-3 text-xs font-semibold" style={{ color: 'var(--theme-text)' }}>
                     {a.recommendedSig}
                   </td>
                   <td className="px-4 py-3 text-xs" style={{ color: 'var(--theme-text-muted)', maxWidth: 240 }}>
@@ -450,7 +490,11 @@ export default function AlgorithmPage() {
             {tab === id && (
               <motion.div
                 layoutId="algo-tab-bg"
-                className="absolute inset-0 bg-[#0C6DFD]/15 border border-[#0C6DFD]/30 rounded-lg"
+                className="absolute inset-0 rounded-lg"
+                style={{
+                  backgroundColor: 'var(--theme-card-hover)',
+                  border: '1px solid var(--theme-card-border)',
+                }}
                 transition={{ type: 'spring', stiffness: 350, damping: 30 }}
               />
             )}
@@ -475,7 +519,7 @@ export default function AlgorithmPage() {
             <div className="grid grid-cols-3 gap-4">
               <GlassCard className="p-5" delay={0.2}>
                 <div className="flex items-center gap-2 mb-2">
-                  <div className="w-2 h-2 rounded-full bg-[#0C6DFD]" />
+                  <div className="w-2 h-2 rounded-full algo-pill-dot" />
                   <h4 className="text-sm font-semibold" style={{ color: 'var(--theme-text)' }}>ML-DSA (Dilithium)</h4>
                 </div>
                 <p className="text-xs leading-relaxed" style={{ color: 'var(--theme-text-muted)' }}>
@@ -485,7 +529,7 @@ export default function AlgorithmPage() {
               </GlassCard>
               <GlassCard className="p-5" delay={0.3}>
                 <div className="flex items-center gap-2 mb-2">
-                  <div className="w-2 h-2 rounded-full bg-[#10B981]" />
+                  <div className="w-2 h-2 rounded-full algo-pill-dot" />
                   <h4 className="text-sm font-semibold" style={{ color: 'var(--theme-text)' }}>ML-KEM (Kyber)</h4>
                 </div>
                 <p className="text-xs leading-relaxed" style={{ color: 'var(--theme-text-muted)' }}>
@@ -495,7 +539,7 @@ export default function AlgorithmPage() {
               </GlassCard>
               <GlassCard className="p-5" delay={0.4}>
                 <div className="flex items-center gap-2 mb-2">
-                  <div className="w-2 h-2 rounded-full bg-[#8B5CF6]" />
+                  <div className="w-2 h-2 rounded-full algo-pill-dot" />
                   <h4 className="text-sm font-semibold" style={{ color: 'var(--theme-text)' }}>SLH-DSA & FN-DSA</h4>
                 </div>
                 <p className="text-xs leading-relaxed" style={{ color: 'var(--theme-text-muted)' }}>

@@ -18,11 +18,13 @@ const WEEKS_REMAINING = Math.floor(
 const TOTAL_DEVICES = deviceGroups.reduce((s, d) => s + d.count, 0);
 const MIGRATION_VELOCITY = 420; // devices per week (static for demo)
 
+// Verdict returns a color token string — resolved in JSX via style or class
 function getProjectedCompletion(devicesReady: number): {
   date: Date;
   weeksLeft: number;
   verdict: 'on-track' | 'at-risk' | 'miss';
   label: string;
+  // color is now a CSS variable string or the single accent hex
   color: string;
 } {
   const remaining = TOTAL_DEVICES - devicesReady;
@@ -31,20 +33,21 @@ function getProjectedCompletion(devicesReady: number): {
   const buffer = WEEKS_REMAINING - weeksNeeded;
 
   if (buffer >= 8) {
-    return { date: projectedDate, weeksLeft: weeksNeeded, verdict: 'on-track', label: 'On Track', color: '#10B981' };
+    // on-track → plain off-white text, no accent needed
+    return { date: projectedDate, weeksLeft: weeksNeeded, verdict: 'on-track', label: 'On Track', color: 'var(--theme-text)' };
   } else if (buffer >= 0) {
-    return { date: projectedDate, weeksLeft: weeksNeeded, verdict: 'at-risk', label: 'At Risk', color: '#F97316' };
+    // at-risk → subdued secondary text
+    return { date: projectedDate, weeksLeft: weeksNeeded, verdict: 'at-risk', label: 'At Risk', color: 'var(--theme-text-secondary)' };
   } else {
-    return { date: projectedDate, weeksLeft: weeksNeeded, verdict: 'miss', label: 'Will Miss Deadline', color: '#EF4444' };
+    // miss → the one place the orange accent is permitted
+    return { date: projectedDate, weeksLeft: weeksNeeded, verdict: 'miss', label: 'Will Miss Deadline', color: '#E5753C' };
   }
 }
 
 const stepIcons = [Radio, AlertTriangle, Server, ShieldCheck, Cpu, CheckCircle2];
-const stepColors = ['#6366F1', '#EF4444', '#0C6DFD', '#10B981', '#F97316', '#10B981'];
 
 function StepCard({ step, index }: { step: BlueprintStep; index: number }) {
   const Icon = stepIcons[index];
-  const color = stepColors[index];
   const isDone = step.status === 'done';
   const isActive = step.status === 'active';
   const isLocked = step.status === 'locked';
@@ -60,7 +63,7 @@ function StepCard({ step, index }: { step: BlueprintStep; index: number }) {
       {index < blueprintSteps.length - 1 && (
         <div
           className="absolute left-[21px] top-[44px] bottom-[-16px] w-0.5"
-          style={{ backgroundColor: isDone ? color + '60' : 'var(--theme-card-border)' }}
+          style={{ backgroundColor: 'var(--theme-card-border)' }}
         />
       )}
 
@@ -68,21 +71,17 @@ function StepCard({ step, index }: { step: BlueprintStep; index: number }) {
       <div
         className="relative w-11 h-11 rounded-full flex-shrink-0 flex items-center justify-center z-10 mt-1"
         style={{
-          backgroundColor: isDone
-            ? color + '25'
-            : isActive
-            ? color + '15'
-            : 'var(--theme-card)',
-          border: `2px solid ${isDone || isActive ? color : 'var(--theme-card-border)'}`,
+          backgroundColor: 'var(--theme-card)',
+          border: `2px solid ${isActive ? 'var(--theme-text-secondary)' : 'var(--theme-card-border)'}`,
           opacity: isLocked ? 0.55 : 1,
         }}
       >
         {isDone ? (
-          <CheckCircle2 className="w-5 h-5" style={{ color }} />
+          <CheckCircle2 className="w-5 h-5" style={{ color: 'var(--theme-text-secondary)' }} />
         ) : isLocked ? (
           <Lock className="w-4 h-4" style={{ color: 'var(--theme-text-muted)' }} />
         ) : (
-          <Icon className="w-5 h-5" style={{ color }} />
+          <Icon className="w-5 h-5" style={{ color: 'var(--theme-text-muted)' }} />
         )}
       </div>
 
@@ -90,8 +89,8 @@ function StepCard({ step, index }: { step: BlueprintStep; index: number }) {
       <div
         className="flex-1 rounded-xl p-4 mb-4"
         style={{
-          backgroundColor: isActive ? color + '08' : 'var(--theme-card)',
-          border: `1px solid ${isActive ? color + '40' : 'var(--theme-card-border)'}`,
+          backgroundColor: 'var(--theme-card)',
+          border: `1px solid ${isActive ? 'var(--theme-text-secondary)' : 'var(--theme-card-border)'}`,
           opacity: isLocked ? 0.6 : 1,
         }}
       >
@@ -100,25 +99,43 @@ function StepCard({ step, index }: { step: BlueprintStep; index: number }) {
             <div className="flex items-center gap-2 mb-0.5">
               <span
                 className="text-[10px] font-bold uppercase tracking-widest"
-                style={{ color }}
+                style={{ color: 'var(--theme-text-dim)' }}
               >
                 Step {step.id}
               </span>
+
+              {/* Done badge */}
               {isDone && (
-                <span className="text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/15 text-emerald-400 font-semibold">
+                <span
+                  className="text-[10px] px-1.5 py-0.5 rounded font-semibold"
+                  style={{
+                    backgroundColor: 'var(--theme-card-border)',
+                    color: 'var(--theme-text-secondary)',
+                  }}
+                >
                   Done
                 </span>
               )}
+
+              {/* In Progress badge — single orange accent use */}
               {isActive && (
                 <span
                   className="text-[10px] px-1.5 py-0.5 rounded font-semibold"
-                  style={{ backgroundColor: color + '20', color }}
+                  style={{ backgroundColor: 'rgba(229,117,60,0.15)', color: '#E5753C' }}
                 >
                   In Progress
                 </span>
               )}
+
+              {/* Upcoming badge */}
               {isLocked && (
-                <span className="text-[10px] px-1.5 py-0.5 rounded bg-white/5 text-slate-500 font-semibold">
+                <span
+                  className="text-[10px] px-1.5 py-0.5 rounded font-semibold"
+                  style={{
+                    backgroundColor: 'var(--theme-card-border)',
+                    color: 'var(--theme-text-dim)',
+                  }}
+                >
                   Upcoming
                 </span>
               )}
@@ -181,12 +198,36 @@ export default function BlueprintPage() {
   const circumference = 2 * Math.PI * 54;
   const offset = circumference * (1 - progressPercent / 100);
 
+  // Verdict pill styling: only "miss" gets orange; others stay monochrome
+  const verdictPillStyle: Record<string, React.CSSProperties> = {
+    'on-track': {
+      backgroundColor: 'var(--theme-card-border)',
+      color: 'var(--theme-text)',
+    },
+    'at-risk': {
+      backgroundColor: 'var(--theme-card-border)',
+      color: 'var(--theme-text-secondary)',
+    },
+    miss: {
+      backgroundColor: 'rgba(229,117,60,0.15)',
+      color: '#E5753C',
+    },
+  };
+
+  // KPI icon colors: all muted, no bright hues
+  const kpiIcons = [
+    { label: 'Total Fleet Devices', value: TOTAL_DEVICES.toLocaleString(), sub: 'across all industries', icon: Server },
+    { label: 'Devices Migrated', value: devicesReady.toLocaleString(), sub: `${TOTAL_DEVICES - devicesReady} remaining`, icon: TrendingUp },
+    { label: 'No Crypto Identity', value: noCertCount.toLocaleString(), sub: 'devices with zero certs', icon: AlertTriangle },
+    { label: 'Weeks to Deadline', value: WEEKS_REMAINING, sub: 'CNSA 2.0 — Jan 1, 2027', icon: Clock },
+  ];
+
   return (
     <div className="p-6 space-y-6 max-w-6xl mx-auto">
       {/* Page header */}
       <motion.div initial={{ opacity: 0, y: -12 }} animate={{ opacity: 1, y: 0 }}>
         <div className="flex items-center gap-3 mb-1">
-          <Map className="w-6 h-6 text-[#0C6DFD]" />
+          <Map className="w-6 h-6" style={{ color: 'var(--theme-text-muted)' }} />
           <h1 className="text-2xl font-bold" style={{ color: 'var(--theme-text)' }}>
             PQC Readiness Blueprint
           </h1>
@@ -198,6 +239,7 @@ export default function BlueprintPage() {
 
       {/* Top row — projection */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+
         {/* Progress arc */}
         <motion.div
           initial={{ opacity: 0, scale: 0.96 }}
@@ -207,17 +249,19 @@ export default function BlueprintPage() {
         >
           <div className="relative w-32 h-32 mb-3">
             <svg className="w-full h-full -rotate-90" viewBox="0 0 120 120">
+              {/* Track ring */}
               <circle
                 cx="60" cy="60" r="54"
                 fill="none"
                 strokeWidth="8"
                 style={{ stroke: 'var(--theme-bar-bg)' }}
               />
+              {/* Progress arc — secondary text tone, or orange on miss */}
               <motion.circle
                 cx="60" cy="60" r="54"
                 fill="none"
                 strokeWidth="8"
-                stroke={projection.color}
+                stroke={projection.verdict === 'miss' ? '#E5753C' : 'var(--theme-text-secondary)'}
                 strokeLinecap="round"
                 strokeDasharray={circumference}
                 initial={{ strokeDashoffset: circumference }}
@@ -234,9 +278,11 @@ export default function BlueprintPage() {
               </div>
             </div>
           </div>
+
+          {/* Verdict pill */}
           <div
             className="text-sm font-bold px-3 py-1 rounded-full"
-            style={{ backgroundColor: projection.color + '20', color: projection.color }}
+            style={verdictPillStyle[projection.verdict]}
           >
             {projection.label}
           </div>
@@ -244,43 +290,14 @@ export default function BlueprintPage() {
 
         {/* KPI cards */}
         <div className="lg:col-span-2 grid grid-cols-2 gap-3">
-          {[
-            {
-              label: 'Total Fleet Devices',
-              value: TOTAL_DEVICES.toLocaleString(),
-              sub: 'across all industries',
-              icon: Server,
-              color: '#0C6DFD',
-            },
-            {
-              label: 'Devices Migrated',
-              value: devicesReady.toLocaleString(),
-              sub: `${TOTAL_DEVICES - devicesReady} remaining`,
-              icon: TrendingUp,
-              color: '#10B981',
-            },
-            {
-              label: 'No Crypto Identity',
-              value: noCertCount.toLocaleString(),
-              sub: 'devices with zero certs',
-              icon: AlertTriangle,
-              color: '#EF4444',
-            },
-            {
-              label: 'Weeks to Deadline',
-              value: WEEKS_REMAINING,
-              sub: 'CNSA 2.0 — Jan 1, 2027',
-              icon: Clock,
-              color: projection.color,
-            },
-          ].map(({ label, value, sub, icon: Icon, color }) => (
+          {kpiIcons.map(({ label, value, sub, icon: Icon }) => (
             <div
               key={label}
               className="rounded-xl p-4 flex flex-col gap-1"
               style={{ backgroundColor: 'var(--theme-card)', border: '1px solid var(--theme-card-border)' }}
             >
               <div className="flex items-center gap-2 mb-1">
-                <Icon className="w-4 h-4" style={{ color }} />
+                <Icon className="w-4 h-4" style={{ color: 'var(--theme-text-muted)' }} />
                 <span className="text-xs" style={{ color: 'var(--theme-text-muted)' }}>{label}</span>
               </div>
               <div className="text-2xl font-bold" style={{ color: 'var(--theme-text)' }}>
@@ -300,29 +317,42 @@ export default function BlueprintPage() {
         className="rounded-xl px-5 py-4 flex items-center gap-4"
         style={{ backgroundColor: 'var(--theme-card)', border: '1px solid var(--theme-card-border)' }}
       >
-        <TrendingUp className="w-4 h-4 flex-shrink-0 text-[#0C6DFD]" />
+        <TrendingUp className="w-4 h-4 flex-shrink-0" style={{ color: 'var(--theme-text-muted)' }} />
         <div className="flex-1">
           <div className="flex items-center justify-between text-xs mb-1.5">
             <span style={{ color: 'var(--theme-text-secondary)' }}>
-              Current migration velocity: <strong style={{ color: 'var(--theme-text)' }}>{MIGRATION_VELOCITY} devices/week</strong>
+              Current migration velocity:{' '}
+              <strong className="blueprint-velocity-strong">{MIGRATION_VELOCITY} devices/week</strong>
             </span>
-            <span style={{ color: projection.color }}>
-              Projected completion: {projection.date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}
+            {/* Projected date: orange only when missing deadline */}
+            <span
+              style={{
+                color: projection.verdict === 'miss' ? '#E5753C' : 'var(--theme-text-secondary)',
+              }}
+            >
+              Projected completion:{' '}
+              {projection.date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}
             </span>
           </div>
           <div className="h-2 rounded-full overflow-hidden" style={{ backgroundColor: 'var(--theme-bar-bg)' }}>
             <motion.div
               className="h-full rounded-full"
-              style={{ backgroundColor: '#0C6DFD' }}
+              style={{ backgroundColor: 'var(--theme-text-secondary)' }}
               initial={{ width: 0 }}
               animate={{ width: `${progressPercent}%` }}
               transition={{ duration: 1, ease: 'easeOut' }}
             />
           </div>
         </div>
+
+        {/* Action pill — orange only on miss verdict */}
         <div
           className="flex-shrink-0 flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg"
-          style={{ backgroundColor: projection.color + '18', color: projection.color }}
+          style={
+            projection.verdict === 'miss'
+              ? { backgroundColor: 'rgba(229,117,60,0.15)', color: '#E5753C' }
+              : { backgroundColor: 'var(--theme-card-border)', color: 'var(--theme-text-secondary)' }
+          }
         >
           <ChevronRight className="w-3.5 h-3.5" />
           {projection.verdict === 'miss' ? 'Increase velocity' : 'Maintain pace'}
@@ -351,18 +381,21 @@ export default function BlueprintPage() {
           Two-Agent Strategy
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {/* TrustEdge */}
+
+          {/* TrustEdge Agent — neutral border, no blue */}
           <div
             className="rounded-2xl p-5"
-            style={{ backgroundColor: 'var(--theme-card)', border: '1px solid rgba(12,109,253,0.3)' }}
+            style={{ backgroundColor: 'var(--theme-card)', border: '1px solid var(--theme-card-border)' }}
           >
             <div className="flex items-center gap-3 mb-3">
-              <div className="w-9 h-9 rounded-lg bg-[#0C6DFD]/20 flex items-center justify-center">
-                <ShieldCheck className="w-5 h-5 text-[#0C6DFD]" />
+              <div className="w-9 h-9 rounded-lg flex items-center justify-center blueprint-agent-icon-bg">
+                <ShieldCheck className="w-5 h-5" style={{ color: 'var(--theme-text-muted)' }} />
               </div>
               <div>
                 <div className="text-sm font-bold" style={{ color: 'var(--theme-text)' }}>TrustEdge Agent</div>
-                <div className="text-[11px]" style={{ color: '#0C6DFD' }}>Full-capability · Capable devices</div>
+                <div className="text-[11px]" style={{ color: 'var(--theme-text-secondary)' }}>
+                  Full-capability · Capable devices
+                </div>
               </div>
             </div>
             <ul className="space-y-2">
@@ -373,8 +406,15 @@ export default function BlueprintPage() {
                 'Automatic rollback on failed deployment',
                 'Real-time status reporting to Readiness Dashboard',
               ].map((item) => (
-                <li key={item} className="flex items-start gap-2 text-xs" style={{ color: 'var(--theme-text-secondary)' }}>
-                  <CheckCircle2 className="w-3.5 h-3.5 text-[#0C6DFD] flex-shrink-0 mt-0.5" />
+                <li
+                  key={item}
+                  className="flex items-start gap-2 text-xs"
+                  style={{ color: 'var(--theme-text-secondary)' }}
+                >
+                  <CheckCircle2
+                    className="w-3.5 h-3.5 flex-shrink-0 mt-0.5"
+                    style={{ color: 'var(--theme-text-muted)' }}
+                  />
                   {item}
                 </li>
               ))}
@@ -387,18 +427,21 @@ export default function BlueprintPage() {
             </div>
           </div>
 
-          {/* Kernel Module */}
+          {/* Kernel Module + SDK — neutral border, orange accent only on icon */}
           <div
             className="rounded-2xl p-5"
-            style={{ backgroundColor: 'var(--theme-card)', border: '1px solid rgba(249,115,22,0.3)' }}
+            style={{ backgroundColor: 'var(--theme-card)', border: '1px solid var(--theme-card-border)' }}
           >
             <div className="flex items-center gap-3 mb-3">
-              <div className="w-9 h-9 rounded-lg bg-orange-500/15 flex items-center justify-center">
-                <Cpu className="w-5 h-5 text-orange-400" />
+              <div className="w-9 h-9 rounded-lg flex items-center justify-center blueprint-kernel-icon-bg">
+                {/* One deliberate orange accent: the constrained-device icon */}
+                <Cpu className="w-5 h-5" style={{ color: '#E5753C' }} />
               </div>
               <div>
                 <div className="text-sm font-bold" style={{ color: 'var(--theme-text)' }}>Kernel Module + SDK</div>
-                <div className="text-[11px] text-orange-400">Lightweight · Brownfield devices</div>
+                <div className="text-[11px]" style={{ color: 'var(--theme-text-secondary)' }}>
+                  Lightweight · Brownfield devices
+                </div>
               </div>
             </div>
             <ul className="space-y-2">
@@ -409,8 +452,15 @@ export default function BlueprintPage() {
                 'Supports ML-KEM-512 + FN-DSA-512 on constrained hardware',
                 'Chunked data upload — battery and bandwidth efficient',
               ].map((item) => (
-                <li key={item} className="flex items-start gap-2 text-xs" style={{ color: 'var(--theme-text-secondary)' }}>
-                  <CheckCircle2 className="w-3.5 h-3.5 text-orange-400 flex-shrink-0 mt-0.5" />
+                <li
+                  key={item}
+                  className="flex items-start gap-2 text-xs"
+                  style={{ color: 'var(--theme-text-secondary)' }}
+                >
+                  <CheckCircle2
+                    className="w-3.5 h-3.5 flex-shrink-0 mt-0.5"
+                    style={{ color: 'var(--theme-text-muted)' }}
+                  />
                   {item}
                 </li>
               ))}
@@ -422,6 +472,7 @@ export default function BlueprintPage() {
               Works on: ≥8KB RAM · No OS requirement · UART / BLE / NB-IoT
             </div>
           </div>
+
         </div>
       </motion.div>
     </div>

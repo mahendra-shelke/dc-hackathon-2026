@@ -49,7 +49,7 @@ export default function ExecutiveDashboard() {
               delay={0.15}
             />
             {hasDiscovery && (
-              <span className="absolute top-3 right-3 px-2 py-0.5 text-[10px] font-medium rounded-full bg-[#0C6DFD]/20 text-[#0C6DFD] border border-[#0C6DFD]/30">
+              <span className="absolute top-3 right-3 px-2 py-0.5 text-[10px] font-medium rounded-full" style={{ backgroundColor: 'var(--theme-card-inner)', color: 'var(--theme-text-secondary)', border: '1px solid var(--theme-card-border)' }}>
                 +{discoveredCount} from Discovery
               </span>
             )}

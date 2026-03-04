@@ -1,19 +1,17 @@
 import { createContext, useContext, useState, useCallback, useEffect, type ReactNode } from 'react';
 
-export type ThemeId = 'deep-navy' | 'charcoal-gradient' | 'digicert-blue' | 'light';
+export type ThemeId = 'deep-navy' | 'light';
 
 export interface ThemeOption {
   id: ThemeId;
   label: string;
   description: string;
-  preview: string; // CSS color for the preview swatch
+  preview: string;
 }
 
 export const themes: ThemeOption[] = [
-  { id: 'deep-navy', label: 'Obsidian', description: 'Clean flat dark', preview: '#09090B' },
-  { id: 'charcoal-gradient', label: 'Graphite', description: 'Warm neutral dark', preview: '#111110' },
-  { id: 'digicert-blue', label: 'DigiCert', description: 'Brand dark blue', preview: '#080E1C' },
-  { id: 'light', label: 'Light', description: 'Clean white/gray', preview: '#f8fafc' },
+  { id: 'deep-navy', label: 'Dark', description: 'Clean flat dark', preview: '#09090B' },
+  { id: 'light', label: 'Light', description: 'Clean white', preview: '#FAFAFA' },
 ];
 
 interface ThemeContextType {
@@ -24,10 +22,13 @@ interface ThemeContextType {
 
 const ThemeContext = createContext<ThemeContextType | null>(null);
 
+const VALID_THEMES: ThemeId[] = ['deep-navy', 'light'];
+
 export function ThemeProvider({ children }: { children: ReactNode }) {
   const [theme, setThemeState] = useState<ThemeId>(() => {
     if (typeof window !== 'undefined') {
-      return (localStorage.getItem('pqc-theme') as ThemeId) || 'deep-navy';
+      const stored = localStorage.getItem('pqc-theme') as ThemeId;
+      return VALID_THEMES.includes(stored) ? stored : 'deep-navy';
     }
     return 'deep-navy';
   });
