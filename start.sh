@@ -25,17 +25,17 @@ usage() {
 }
 
 get_pid() {
-  lsof -ti :"$PORT" 2>/dev/null
+  lsof -ti :"$PORT" 2>/dev/null || true
 }
 
 do_stop() {
-  local PID
-  PID=$(get_pid)
-  if [ -n "$PID" ]; then
-    echo "Stopping dev server (PID $PID) on port $PORT..."
-    kill "$PID" 2>/dev/null
+  local PIDS
+  PIDS=$(get_pid)
+  if [ -n "$PIDS" ]; then
+    echo "Stopping dev server on port $PORT (PIDs: $(echo $PIDS))..."
+    echo "$PIDS" | xargs kill 2>/dev/null || true
     sleep 1
-    kill -9 "$PID" 2>/dev/null
+    echo "$PIDS" | xargs kill -9 2>/dev/null || true
     echo "Stopped."
   else
     echo "No dev server running on port $PORT."
@@ -75,10 +75,10 @@ do_start() {
     esac
   done
 
-  local PID
-  PID=$(get_pid)
-  if [ -n "$PID" ]; then
-    echo "Dev server already running (PID $PID) on port $PORT."
+  local PIDS
+  PIDS=$(get_pid)
+  if [ -n "$PIDS" ]; then
+    echo "Dev server already running (PIDs: $(echo $PIDS)) on port $PORT."
     echo "Run './start.sh stop' first or './start.sh restart'."
     exit 1
   fi
@@ -95,11 +95,11 @@ do_start() {
 
 # Parse --port and --help from any position
 ARGS=()
-for arg in "$@"; do
-  case "$arg" in
-    --port)  shift; PORT="${1:-5173}"; shift || true ;;
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --port)  PORT="${2:-5173}"; shift 2 ;;
     -h|--help) usage; exit 0 ;;
-    *) ARGS+=("$arg") ;;
+    *) ARGS+=("$1"); shift ;;
   esac
 done
 
@@ -114,9 +114,9 @@ case "$CMD" in
   clean)   do_stop; do_clean ;;
   reset)   do_stop; do_clean; do_install; do_build; do_start "${ARGS[@]}" ;;
   status)
-    PID=$(get_pid)
-    if [ -n "$PID" ]; then
-      echo "Dev server running (PID $PID) on port $PORT."
+    PIDS=$(get_pid)
+    if [ -n "$PIDS" ]; then
+      echo "Dev server running (PIDs: $(echo $PIDS)) on port $PORT."
     else
       echo "No dev server running on port $PORT."
     fi
