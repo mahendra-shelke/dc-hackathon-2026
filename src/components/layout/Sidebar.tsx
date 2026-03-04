@@ -27,7 +27,7 @@ export default function Sidebar() {
 
   return (
     <aside
-      className="fixed left-0 top-0 bottom-0 w-64 backdrop-blur-xl flex flex-col z-50 transition-colors duration-300"
+      className="fixed left-0 top-0 bottom-0 w-64 flex flex-col z-50 transition-colors duration-300"
       style={{
         backgroundColor: 'var(--theme-sidebar)',
         borderRight: '1px solid var(--theme-sidebar-border)',

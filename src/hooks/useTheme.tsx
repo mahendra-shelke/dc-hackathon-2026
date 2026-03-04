@@ -10,9 +10,9 @@ export interface ThemeOption {
 }
 
 export const themes: ThemeOption[] = [
-  { id: 'deep-navy', label: 'Deep Navy', description: 'Dark, high contrast', preview: '#020617' },
-  { id: 'charcoal-gradient', label: 'Charcoal Gradient', description: 'Dark with indigo gradient', preview: '#1e1b4b' },
-  { id: 'digicert-blue', label: 'DigiCert Blue', description: 'Brand-aligned dark blue', preview: '#0b1120' },
+  { id: 'deep-navy', label: 'Obsidian', description: 'Clean flat dark', preview: '#09090B' },
+  { id: 'charcoal-gradient', label: 'Graphite', description: 'Warm neutral dark', preview: '#111110' },
+  { id: 'digicert-blue', label: 'DigiCert', description: 'Brand dark blue', preview: '#080E1C' },
   { id: 'light', label: 'Light', description: 'Clean white/gray', preview: '#f8fafc' },
 ];
 

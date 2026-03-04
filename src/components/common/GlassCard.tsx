@@ -17,7 +17,7 @@ export default function GlassCard({ children, className = '', hover = false, onC
       transition={{ duration: 0.4, delay, ease: 'easeOut' }}
       onClick={onClick}
       className={`
-        backdrop-blur-xl rounded-xl transition-colors duration-300
+        rounded-xl transition-colors duration-200
         ${hover ? 'cursor-pointer' : ''}
         ${className}
       `}

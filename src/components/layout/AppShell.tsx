@@ -2,18 +2,13 @@ import { Outlet } from 'react-router';
 import Sidebar from './Sidebar';
 import PageTransition from './PageTransition';
 import StoryPanel from '../story/StoryPanel';
-import { useTheme } from '../../hooks/useTheme';
 
 export default function AppShell() {
-  const { theme } = useTheme();
-  const hasGradient = theme === 'charcoal-gradient';
-
   return (
     <div
       className="min-h-screen transition-colors duration-300"
       style={{
         backgroundColor: 'var(--theme-bg)',
-        backgroundImage: hasGradient ? 'var(--theme-bg-gradient)' : 'none',
         color: 'var(--theme-text)',
       }}
     >
