@@ -1,28 +1,28 @@
 import { NavLink, useLocation } from 'react-router';
 import { motion } from 'framer-motion';
 import {
-  LayoutDashboard, Clock, Grid3X3, FlaskConical,
-  FileKey, GitBranch, Play, RotateCcw, Shield, Radar,
-  Palette, Check,
+  LayoutDashboard, FlaskConical,
+  Play, RotateCcw, Shield, Radar,
+  Palette, Check, Map, BookOpen,
 } from 'lucide-react';
 import { useSimulation } from '../../hooks/useSimulation';
 import { useTheme, themes } from '../../hooks/useTheme';
+import { useStory } from '../../hooks/useStory';
 import { useState } from 'react';
 
+// Core demo pages — keep this list short and executive-friendly
 const navItems = [
-  { to: '/', icon: LayoutDashboard, label: 'Executive Dashboard' },
+  { to: '/', icon: LayoutDashboard, label: 'Overview' },
   { to: '/discovery', icon: Radar, label: 'Discovery' },
-  { to: '/hndl', icon: Clock, label: 'HNDL Risk Timeline' },
-  { to: '/fleet', icon: Grid3X3, label: 'Fleet Heatmap' },
-  { to: '/algorithms', icon: FlaskConical, label: 'Algorithm Matrix' },
-  { to: '/certificates', icon: FileKey, label: 'Certificate Impact' },
-  { to: '/migration', icon: GitBranch, label: 'Migration Sequencer' },
+  { to: '/blueprint', icon: Map, label: 'Readiness Blueprint' },
+  { to: '/algorithms', icon: FlaskConical, label: 'Algorithm Intel' },
 ];
 
 export default function Sidebar() {
   const location = useLocation();
   const { state, isSimulated, startSimulation, resetSimulation } = useSimulation();
   const { theme, setTheme, isLight } = useTheme();
+  const { isOpen, togglePanel } = useStory();
   const [themeOpen, setThemeOpen] = useState(false);
 
   return (
@@ -41,7 +41,7 @@ export default function Sidebar() {
           </div>
           <div>
             <div className="text-sm font-bold tracking-wide" style={{ color: 'var(--theme-text)' }}>DigiCert</div>
-            <div className="text-[10px] uppercase tracking-widest" style={{ color: 'var(--theme-text-muted)' }}>PQC Fleet Readiness</div>
+            <div className="text-[10px] uppercase tracking-widest" style={{ color: 'var(--theme-text-muted)' }}>PQC Migration Platform</div>
           </div>
         </div>
       </div>
@@ -81,6 +81,7 @@ export default function Sidebar() {
       {/* Theme Switcher */}
       <div className="px-3 pb-2">
         <button
+          type="button"
           onClick={() => setThemeOpen(!themeOpen)}
           className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-xs transition-colors"
           style={{
@@ -98,6 +99,7 @@ export default function Sidebar() {
           <div className="mt-1 space-y-0.5 px-1">
             {themes.map((t) => (
               <button
+                type="button"
                 key={t.id}
                 onClick={() => setTheme(t.id)}
                 className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-xs transition-colors"
@@ -121,10 +123,31 @@ export default function Sidebar() {
         )}
       </div>
 
+      {/* Story Mode Toggle */}
+      <div className="px-3 pb-2">
+        <button
+          type="button"
+          onClick={togglePanel}
+          className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-xs transition-colors"
+          style={{
+            color: isOpen ? '#0C6DFD' : 'var(--theme-text-muted)',
+            backgroundColor: isOpen ? 'rgba(12,109,253,0.12)' : 'transparent',
+            border: isOpen ? '1px solid rgba(12,109,253,0.3)' : '1px solid transparent',
+          }}
+        >
+          <BookOpen className="w-3.5 h-3.5" />
+          <span>Story Mode</span>
+          {isOpen && (
+            <span className="ml-auto text-[10px] font-semibold text-[#0C6DFD]">ON</span>
+          )}
+        </button>
+      </div>
+
       {/* Simulation Button */}
       <div className="p-4" style={{ borderTop: '1px solid var(--theme-sidebar-border)' }}>
         {!isSimulated && !state.isRunning && (
           <button
+            type="button"
             onClick={startSimulation}
             className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-[#0C6DFD] hover:bg-[#0955CC] text-white text-sm font-semibold rounded-lg transition-colors"
           >
@@ -148,6 +171,7 @@ export default function Sidebar() {
         )}
         {isSimulated && !state.isRunning && (
           <button
+            type="button"
             onClick={resetSimulation}
             className="w-full flex items-center justify-center gap-2 px-4 py-3 text-sm font-semibold rounded-lg transition-colors"
             style={{

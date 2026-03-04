@@ -24,6 +24,7 @@ export interface DeviceGroup {
   migrationPhase: MigrationPhase;
   certExpiryMonths: number;
   dataAtRiskTB: number;
+  certStatus?: CertStatus; // optional — devices without this field assumed 'classical'
 }
 
 export interface PqcAlgorithm {
@@ -155,4 +156,78 @@ export interface DiscoveryState {
   deploymentProgress: number;
   logEntries: DiscoveryLogEntry[];
   isComplete: boolean;
+}
+
+// --- Cert Status ---
+export type CertStatus = 'none' | 'classical' | 'hybrid' | 'pqc';
+
+// --- Story Mode ---
+export interface StoryChapter {
+  id: number;
+  title: string;
+  tagline: string;
+  detail: string;
+  route: string;
+  tabHint?: string; // optional tab to activate on the target page
+}
+
+// --- Kernel Agent ---
+export type AgentType = 'trustEdge' | 'kernelModule';
+
+export interface KernelAgent {
+  id: string;
+  hostname: string;
+  ip: string;
+  agentType: AgentType;
+  agentVersion: string;
+  deviceClass: DeviceClass;
+  certStatus: CertStatus;
+  currentAlgorithm: string;
+  memoryKB: number;
+  cpuMHz: number;
+  firmwareVersion: string;
+  lastHeartbeat: number; // unix ms offset from "now" — e.g. -3000 means 3s ago
+  industry: Industry;
+}
+
+// --- Blueprint ---
+export type BlueprintStepStatus = 'locked' | 'active' | 'done';
+
+export interface BlueprintStep {
+  id: number;
+  title: string;
+  description: string;
+  agentTool: string;
+  deviceCount: number;
+  timeWindowWeeks: number;
+  deviceClasses: DeviceClass[];
+  status: BlueprintStepStatus;
+}
+
+// --- Deprecation ---
+export type AlgoDeprecationStatus = 'active' | 'deprecated' | 'disallowed' | 'sunset';
+
+export interface ClassicalAlgoDeprecation {
+  id: string;
+  name: string;
+  family: string;
+  keySize: string;
+  status: AlgoDeprecationStatus;
+  deprecatedYear: number | null;
+  disallowedYear: number | null;
+  sunsetYear: number | null;
+  cnsa10Status: string;
+  cnsa20Status: string;
+  notes: string;
+}
+
+export interface DeviceClassAdvisory {
+  deviceClass: DeviceClass;
+  label: string;
+  ramRange: string;
+  exampleDevices: string;
+  recommendedKem: string;
+  recommendedSig: string;
+  notes: string;
+  color: string;
 }

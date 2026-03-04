@@ -1,4 +1,4 @@
-import { Cpu, ShieldAlert, FileWarning, AlertTriangle, Clock, Database } from 'lucide-react';
+import { Cpu, ShieldAlert, FileWarning, AlertTriangle, Clock, Database, ShieldOff } from 'lucide-react';
 import GlassCard from '../components/common/GlassCard';
 import StatCard from '../components/common/StatCard';
 import ReadinessGauge from '../components/charts/ReadinessGauge';
@@ -15,6 +15,7 @@ export default function ExecutiveDashboard() {
 
   const total = totalDevices(allDeviceGroups);
   const discoveredCount = hasDiscovery ? totalDevices(discoveredDeviceGroups) : 0;
+  const noCertCount = deviceGroups.filter((d) => d.certStatus === 'none').reduce((s, d) => s + d.count, 0);
   const readyCount = isSimulated ? state.devicesReady : countByStatus(allDeviceGroups, 'ready') + (hasDiscovery ? countByStatus(discoveredDeviceGroups, 'hybrid') : 0);
   const readyPct = Math.round((readyCount / total) * 100);
   const expiring = expiringCerts(allDeviceGroups, 12);
@@ -121,6 +122,22 @@ export default function ExecutiveDashboard() {
                   <span className="text-sm text-slate-400">days</span>
                 </div>
                 <p className="text-xs text-slate-500 mt-1">January 2027 compliance target</p>
+              </div>
+            </div>
+          </GlassCard>
+
+          <GlassCard className="p-5" delay={0.48}>
+            <div className="flex items-start gap-3">
+              <div className="p-2 rounded-lg bg-red-600/10">
+                <ShieldOff className="w-5 h-5 text-red-500" />
+              </div>
+              <div>
+                <p className="text-xs text-slate-400 uppercase tracking-wider mb-1">No Crypto Identity</p>
+                <div className="flex items-baseline gap-1">
+                  <AnimatedNumber value={noCertCount} className="text-2xl font-bold text-red-500" />
+                  <span className="text-sm text-slate-400">devices</span>
+                </div>
+                <p className="text-xs text-slate-500 mt-1">Zero certificates — highest unknown risk</p>
               </div>
             </div>
           </GlassCard>

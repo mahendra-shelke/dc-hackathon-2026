@@ -1,6 +1,7 @@
 import { Outlet } from 'react-router';
 import Sidebar from './Sidebar';
 import PageTransition from './PageTransition';
+import StoryPanel from '../story/StoryPanel';
 import { useTheme } from '../../hooks/useTheme';
 
 export default function AppShell() {
@@ -22,6 +23,7 @@ export default function AppShell() {
           <Outlet />
         </PageTransition>
       </main>
+      <StoryPanel />
     </div>
   );
 }
