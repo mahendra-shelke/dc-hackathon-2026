@@ -336,7 +336,7 @@ export default function LandingPage() {
                 Ready for the full walkthrough?
               </div>
               <div className="text-sm" style={{ color: 'var(--theme-text-muted)' }}>
-                The guided tour walks you through all 6 chapters — problem, discovery, deadlines, blueprint, algorithm selection, and proof.
+                The guided tour walks you through all 7 chapters — problem, brownfield discovery, fleet scan, deadlines, blueprint, algorithm selection, and proof.
               </div>
             </div>
           </div>
@@ -368,48 +368,70 @@ export default function LandingPage() {
               tag: 'Full-capability devices',
               points: ['Certificate lifecycle — issue, renew, revoke', 'Full PQC + hybrid cert deployment', 'Policy enforcement & compliance attestation'],
               req: 'Requires ≥ 256KB RAM, firmware update capable',
+              route: null,
             },
             {
               icon: Cpu,
               title: 'Kernel Module + SDK',
               tag: 'Brownfield IoT — constrained hardware',
-              points: ['Telemetry-only: cert status, RAM, CPU, firmware hash', 'Runs on ≥ 8KB RAM — no OS requirement', 'SDK in Python, C, Go — embed into existing firmware'],
+              points: ['Telemetry-only: cert status, RAM, CPU, firmware hash', 'Runs on ≥ 8KB RAM — no OS requirement', 'SDK in Python, C, Go, Rust, Java, Node.js'],
               req: 'Works on UART / BLE / NB-IoT',
+              route: '/kernel-module',
             },
-          ].map(({ icon: Icon, title, tag, points, req }) => (
-            <div
-              key={title}
-              className="rounded-2xl p-5"
-              style={{ backgroundColor: 'var(--theme-card)', border: '1px solid var(--theme-card-border)' }}
-            >
-              <div className="flex items-center gap-3 mb-4">
-                <div
-                  className="w-9 h-9 rounded-xl flex items-center justify-center"
-                  style={{ backgroundColor: 'var(--theme-card-inner)' }}
-                >
-                  <Icon className="w-4 h-4" style={{ color: 'var(--theme-text-muted)' }} />
-                </div>
-                <div>
-                  <div className="text-sm font-bold" style={{ color: 'var(--theme-text)' }}>{title}</div>
-                  <div className="text-[11px]" style={{ color: 'var(--theme-text-muted)' }}>{tag}</div>
-                </div>
-              </div>
-              <ul className="space-y-1.5 mb-3">
-                {points.map((p) => (
-                  <li key={p} className="flex items-start gap-2 text-xs" style={{ color: 'var(--theme-text-secondary)' }}>
-                    <span className="mt-0.5 text-[10px]" style={{ color: '#E5753C' }}>✓</span>
-                    {p}
-                  </li>
-                ))}
-              </ul>
-              <div
-                className="text-[10px] px-2.5 py-1.5 rounded-lg"
-                style={{ backgroundColor: 'var(--theme-bg)', color: 'var(--theme-text-dim)' }}
+          ].map(({ icon: Icon, title, tag, points, req, route }) => {
+            const Wrapper = route ? motion.button : 'div' as any;
+            const wrapperProps = route
+              ? {
+                type: 'button' as const,
+                onClick: () => navigate(route),
+                whileHover: { scale: 1.02 },
+                whileTap: { scale: 0.98 },
+              }
+              : {};
+            return (
+              <Wrapper
+                key={title}
+                className={`rounded-2xl p-5 text-left ${route ? 'cursor-pointer group' : ''}`}
+                style={{ backgroundColor: 'var(--theme-card)', border: '1px solid var(--theme-card-border)' }}
+                {...wrapperProps}
               >
-                {req}
-              </div>
-            </div>
-          ))}
+                <div className="flex items-center gap-3 mb-4">
+                  <div
+                    className="w-9 h-9 rounded-xl flex items-center justify-center"
+                    style={{ backgroundColor: 'var(--theme-card-inner)' }}
+                  >
+                    <Icon className="w-4 h-4" style={{ color: 'var(--theme-text-muted)' }} />
+                  </div>
+                  <div>
+                    <div className="text-sm font-bold" style={{ color: 'var(--theme-text)' }}>{title}</div>
+                    <div className="text-[11px]" style={{ color: 'var(--theme-text-muted)' }}>{tag}</div>
+                  </div>
+                </div>
+                <ul className="space-y-1.5 mb-3">
+                  {points.map((p) => (
+                    <li key={p} className="flex items-start gap-2 text-xs" style={{ color: 'var(--theme-text-secondary)' }}>
+                      <span className="mt-0.5 text-[10px]" style={{ color: '#E5753C' }}>✓</span>
+                      {p}
+                    </li>
+                  ))}
+                </ul>
+                <div
+                  className="text-[10px] px-2.5 py-1.5 rounded-lg"
+                  style={{ backgroundColor: 'var(--theme-bg)', color: 'var(--theme-text-dim)' }}
+                >
+                  {req}
+                </div>
+                {route && (
+                  <div
+                    className="mt-3 text-[11px] font-semibold flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                    style={{ color: '#E5753C' }}
+                  >
+                    Explore <ArrowRight className="w-3 h-3" />
+                  </div>
+                )}
+              </Wrapper>
+            );
+          })}
         </motion.div>
       </div>
     </div>

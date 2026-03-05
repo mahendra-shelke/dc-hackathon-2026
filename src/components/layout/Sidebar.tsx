@@ -2,7 +2,7 @@ import { NavLink, useLocation, useNavigate } from 'react-router';
 import { motion } from 'framer-motion';
 import {
   LayoutDashboard, FlaskConical,
-  Play, RotateCcw, Radar,
+  Play, RotateCcw, Radar, Cpu,
   Palette, Check, Map, BookOpen,
 } from 'lucide-react';
 import DigiCertLogo from '../icons/DigiCertLogo';
@@ -14,6 +14,7 @@ import { useState } from 'react';
 // Core demo pages — keep this list short and executive-friendly
 const navItems = [
   { to: '/', icon: LayoutDashboard, label: 'Dashboard' },
+  { to: '/kernel-module', icon: Cpu, label: 'Kernel Module + SDK' },
   { to: '/discovery', icon: Radar, label: 'Discovery' },
   { to: '/blueprint', icon: Map, label: 'Readiness Blueprint' },
   { to: '/algorithms', icon: FlaskConical, label: 'Algorithm Intel' },
