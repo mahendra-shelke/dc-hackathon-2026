@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import {
   FlaskConical, Clock, Cpu, CheckCircle2, AlertTriangle,
@@ -8,6 +8,7 @@ import GlassCard from '../components/common/GlassCard';
 import AlgorithmMatrix from '../components/charts/AlgorithmMatrix';
 import { classicalAlgoDeprecations, deviceClassAdvisories, cnsaMilestones } from '../data/deprecations';
 import { useStory } from '../hooks/useStory';
+import { useDiscovery } from '../hooks/useDiscovery';
 import type { ClassicalAlgoDeprecation } from '../types';
 
 type Tab = 'matrix' | 'deprecation' | 'advisor';
@@ -44,7 +45,7 @@ function yearToPercent(year: number): number {
   return ((year - TIMELINE_START) / TIMELINE_SPAN) * 100;
 }
 
-function DeprecationTimeline() {
+function DeprecationTimeline({ fleetAlgoCounts }: { fleetAlgoCounts: Map<string, number> }) {
   const todayPercent = yearToPercent(
     TODAY_YEAR + new Date().getMonth() / 12,
   );
@@ -141,6 +142,11 @@ function DeprecationTimeline() {
                   </div>
                   <div className="text-[10px] truncate" style={{ color: 'var(--theme-text-dim)' }}>
                     {algo.keySize}
+                    {(fleetAlgoCounts.get(algo.name) ?? 0) > 0 && (
+                      <span className="ml-1.5 font-semibold" style={{ color }}>
+                        · {fleetAlgoCounts.get(algo.name)} in fleet
+                      </span>
+                    )}
                   </div>
                 </div>
                 <div className="flex-1 min-w-0 relative h-6">
@@ -239,7 +245,7 @@ function DeprecationTimeline() {
           <table className="w-full">
             <thead>
               <tr style={{ borderBottom: '1px solid var(--theme-card-border)' }}>
-                {['Algorithm', 'Status', 'Disallowed', 'Sunset', 'CNSA 2.0', 'Notes'].map((h) => (
+                {['Algorithm', 'Status', 'Your Fleet', 'Disallowed', 'Sunset', 'CNSA 2.0', 'Notes'].map((h) => (
                   <th
                     key={h}
                     className="text-left text-[10px] font-semibold uppercase tracking-wider px-4 py-3"
@@ -272,6 +278,17 @@ function DeprecationTimeline() {
                         {algo.status.charAt(0).toUpperCase() + algo.status.slice(1)}
                       </span>
                     </td>
+                    <td className="px-4 py-3">
+                      {(() => {
+                        const count = fleetAlgoCounts.get(algo.name) ?? 0;
+                        if (count === 0) return <span className="text-xs" style={{ color: 'var(--theme-text-dim)' }}>—</span>;
+                        return (
+                          <span className="text-[10px] font-semibold px-2 py-0.5 rounded" style={{ backgroundColor: `${color}18`, color }}>
+                            {count} device{count !== 1 ? 's' : ''}
+                          </span>
+                        );
+                      })()}
+                    </td>
                     <td className="px-4 py-3 text-xs" style={{ color: 'var(--theme-text-secondary)' }}>
                       {algo.disallowedYear ?? '—'}
                     </td>
@@ -295,7 +312,7 @@ function DeprecationTimeline() {
   );
 }
 
-function DeviceAdvisor() {
+function DeviceAdvisor({ fleetClassCounts }: { fleetClassCounts: Map<string, number> }) {
   const [selected, setSelected] = useState<string | null>(null);
 
   return (
@@ -330,6 +347,11 @@ function DeviceAdvisor() {
                   </div>
                   <div className="text-xs" style={{ color: 'var(--theme-text-muted)' }}>
                     RAM: {advisory.ramRange}
+                    {(fleetClassCounts.get(advisory.deviceClass) ?? 0) > 0 && (
+                      <span className="ml-2 font-semibold" style={{ color: 'var(--theme-text-secondary)' }}>
+                        · {fleetClassCounts.get(advisory.deviceClass)} in your fleet
+                      </span>
+                    )}
                   </div>
                 </div>
                 <div
@@ -450,14 +472,32 @@ function DeviceAdvisor() {
 }
 
 const tabs: { id: Tab; label: string; icon: typeof FlaskConical }[] = [
-  { id: 'matrix', label: 'Algorithm Matrix', icon: FlaskConical },
   { id: 'deprecation', label: 'Deprecation Timeline', icon: Clock },
+  { id: 'matrix', label: 'Algorithm Matrix', icon: FlaskConical },
   { id: 'advisor', label: 'Device Advisor', icon: Cpu },
 ];
 
 export default function AlgorithmPage() {
   const { activeTabHint } = useStory();
-  const [tab, setTab] = useState<Tab>('matrix');
+  const { state: disc } = useDiscovery();
+  const [tab, setTab] = useState<Tab>('deprecation');
+
+  // Build fleet counts from discovered devices
+  const fleetAlgoCounts = useMemo(() => {
+    const counts = new Map<string, number>();
+    for (const d of disc.discoveredDevices) {
+      counts.set(d.currentAlgorithm, (counts.get(d.currentAlgorithm) ?? 0) + 1);
+    }
+    return counts;
+  }, [disc.discoveredDevices]);
+
+  const fleetClassCounts = useMemo(() => {
+    const counts = new Map<string, number>();
+    for (const d of disc.discoveredDevices) {
+      counts.set(d.deviceClass, (counts.get(d.deviceClass) ?? 0) + 1);
+    }
+    return counts;
+  }, [disc.discoveredDevices]);
 
   // React to story navigation
   useEffect(() => {
@@ -469,10 +509,10 @@ export default function AlgorithmPage() {
     <div className="p-8 space-y-6">
       <div>
         <h1 className="text-2xl font-bold" style={{ color: 'var(--theme-text)' }}>
-          Algorithm Intelligence
+          PQC Timeline
         </h1>
         <p className="text-sm mt-1" style={{ color: 'var(--theme-text-muted)' }}>
-          NIST PQC standards, deprecation timelines, and device-aware algorithm recommendations
+          Deprecation timelines, PQC standards, and device-aware algorithm recommendations
         </p>
       </div>
 
@@ -553,8 +593,8 @@ export default function AlgorithmPage() {
           </div>
         )}
 
-        {tab === 'deprecation' && <DeprecationTimeline />}
-        {tab === 'advisor' && <DeviceAdvisor />}
+        {tab === 'deprecation' && <DeprecationTimeline fleetAlgoCounts={fleetAlgoCounts} />}
+        {tab === 'advisor' && <DeviceAdvisor fleetClassCounts={fleetClassCounts} />}
       </motion.div>
     </div>
   );

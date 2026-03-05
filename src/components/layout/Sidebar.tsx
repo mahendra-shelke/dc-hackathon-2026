@@ -1,24 +1,25 @@
 import { NavLink, useLocation, useNavigate } from 'react-router';
 import { motion } from 'framer-motion';
 import {
-  LayoutDashboard, FlaskConical,
-  Play, RotateCcw, Radar, Cpu,
-  Palette, Check, Map, BookOpen, Shield,
+  LayoutDashboard,
+  Play, RotateCcw, Radar,
+  Palette, Check, Map, BookOpen, Shield, BarChart3, Eye, EyeOff,
+  Presentation,
 } from 'lucide-react';
 import DigiCertLogo from '../icons/DigiCertLogo';
 import { useSimulation } from '../../hooks/useSimulation';
 import { useTheme, themes } from '../../hooks/useTheme';
 import { useStory } from '../../hooks/useStory';
+import { useDemoMode } from '../story/DemoBar';
 import { useState } from 'react';
 
 // Core demo pages — keep this list short and executive-friendly
 const navItems = [
   { to: '/', icon: LayoutDashboard, label: 'Dashboard' },
-  { to: '/trustedge', icon: Shield, label: 'TrustEdge' },
-  { to: '/kernel-module', icon: Cpu, label: 'Kernel Module + SDK' },
+  { to: '/sdk-solutions', icon: Shield, label: 'SDK Solutions' },
   { to: '/discovery', icon: Radar, label: 'Discovery' },
   { to: '/blueprint', icon: Map, label: 'Readiness Blueprint' },
-  { to: '/algorithms', icon: FlaskConical, label: 'Algorithm Intel' },
+  { to: '/results', icon: BarChart3, label: 'Results' },
 ];
 
 export default function Sidebar() {
@@ -26,7 +27,8 @@ export default function Sidebar() {
   const navigate = useNavigate();
   const { state, isSimulated, startSimulation, resetSimulation } = useSimulation();
   const { theme, setTheme, isLight } = useTheme();
-  const { isOpen, togglePanel } = useStory();
+  const { isOpen, togglePanel, spotlightEnabled, toggleSpotlight } = useStory();
+  const { active: demoActive, startDemo, stopDemo } = useDemoMode();
   const [themeOpen, setThemeOpen] = useState(false);
 
   return (
@@ -44,8 +46,8 @@ export default function Sidebar() {
             <DigiCertLogo className="w-7 h-7" />
           </div>
           <div>
-            <div className="text-sm font-bold tracking-wide" style={{ color: 'var(--theme-text)' }}>DigiCert</div>
-            <div className="text-[10px] uppercase tracking-widest" style={{ color: 'var(--theme-text-muted)' }}>PQC Migration Platform</div>
+            <div className="text-sm font-bold tracking-wide" style={{ color: 'var(--theme-text)' }}>DigiCert Q-Shield</div>
+            <div className="text-[10px] uppercase tracking-widest" style={{ color: 'var(--theme-text-muted)' }}>PQC Device Migration Assistant</div>
           </div>
         </div>
       </div>
@@ -128,8 +130,8 @@ export default function Sidebar() {
         )}
       </div>
 
-      {/* Story Mode Toggle */}
-      <div className="px-3 pb-2">
+      {/* Guided Tour Toggle */}
+      <div className="px-3 pb-2 space-y-1">
         <button
           type="button"
           onClick={togglePanel}
@@ -141,8 +143,48 @@ export default function Sidebar() {
           }}
         >
           <BookOpen className="w-3.5 h-3.5" />
-          <span>Story Mode</span>
+          <span>Guided Tour</span>
           {isOpen && (
+            <span className="ml-auto text-[10px] font-semibold" style={{ color: '#E5753C' }}>ON</span>
+          )}
+        </button>
+        {isOpen && (
+          <button
+            type="button"
+            onClick={toggleSpotlight}
+            className="w-full flex items-center gap-2 px-3 py-1.5 rounded-lg text-[11px] transition-colors"
+            style={{
+              color: 'var(--theme-text-muted)',
+              backgroundColor: 'transparent',
+            }}
+          >
+            {spotlightEnabled ? <Eye className="w-3 h-3" /> : <EyeOff className="w-3 h-3" />}
+            <span>Spotlight</span>
+            <span
+              className="ml-auto text-[10px] font-semibold"
+              style={{ color: spotlightEnabled ? 'var(--theme-text-secondary)' : 'var(--theme-text-dim)' }}
+            >
+              {spotlightEnabled ? 'ON' : 'OFF'}
+            </span>
+          </button>
+        )}
+      </div>
+
+      {/* Demo Mode Toggle */}
+      <div className="px-3 pb-2">
+        <button
+          type="button"
+          onClick={demoActive ? stopDemo : startDemo}
+          className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-xs transition-colors"
+          style={{
+            color: demoActive ? 'var(--theme-text)' : 'var(--theme-text-muted)',
+            backgroundColor: demoActive ? 'var(--theme-card)' : 'transparent',
+            border: demoActive ? '1px solid var(--theme-card-border)' : '1px solid transparent',
+          }}
+        >
+          <Presentation className="w-3.5 h-3.5" />
+          <span>Demo</span>
+          {demoActive && (
             <span className="ml-auto text-[10px] font-semibold" style={{ color: '#E5753C' }}>ON</span>
           )}
         </button>
@@ -158,7 +200,7 @@ export default function Sidebar() {
             style={{ backgroundColor: 'var(--theme-text)', color: 'var(--theme-bg)' }}
           >
             <Play className="w-4 h-4" />
-            Simulate Migration
+            Run Assessment
           </button>
         )}
         {state.isRunning && (

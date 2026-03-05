@@ -17,7 +17,7 @@ export const migrationTimelines: MigrationTimeline[] = [
         label: 'Testing & Validation',
         startMonth: 6,
         durationMonths: 8,
-        product: 'TrustCore SDK',
+        product: 'TrustEdge Light',
         productDescription: 'Embed PQC libraries into device firmware. Validate ML-DSA and ML-KEM on target hardware.',
       },
       {
@@ -54,7 +54,7 @@ export const migrationTimelines: MigrationTimeline[] = [
         label: 'Testing & Validation',
         startMonth: 5,
         durationMonths: 10,
-        product: 'TrustCore SDK',
+        product: 'TrustEdge Light',
         productDescription: 'Integrate PQC into automotive security stacks. Test with AUTOSAR and V2X protocols.',
       },
       {
@@ -91,7 +91,7 @@ export const migrationTimelines: MigrationTimeline[] = [
         label: 'Testing & Validation',
         startMonth: 4,
         durationMonths: 6,
-        product: 'TrustCore SDK',
+        product: 'TrustEdge Light',
         productDescription: 'Port PQC to constrained chipsets (ARM Cortex-M). Validate with Matter 2.0 test suites.',
       },
       {
@@ -128,7 +128,7 @@ export const migrationTimelines: MigrationTimeline[] = [
         label: 'Testing & Validation',
         startMonth: 8,
         durationMonths: 10,
-        product: 'TrustCore SDK',
+        product: 'TrustEdge Light',
         productDescription: 'Test PQC on industrial controllers. Validate with IEC 62443 security requirements.',
       },
       {
@@ -165,7 +165,7 @@ export const migrationTimelines: MigrationTimeline[] = [
         label: 'Testing & Validation',
         startMonth: 4,
         durationMonths: 6,
-        product: 'TrustCore SDK',
+        product: 'TrustEdge Light',
         productDescription: 'Validate PQC TLS on switches, cameras, and access systems. Performance benchmarking.',
       },
       {

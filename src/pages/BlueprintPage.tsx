@@ -1,263 +1,110 @@
 import { motion } from 'framer-motion';
 import {
-  Map, CheckCircle2, Lock, Server, Cpu, Radio,
-  ShieldCheck, AlertTriangle, TrendingUp, Clock, Users,
-  ChevronRight, Play, RotateCcw, ArrowRight,
+  AlertTriangle, Server, ShieldCheck, Clock,
+  Play, RotateCcw, Search,
 } from 'lucide-react';
 import { useNavigate } from 'react-router';
-import { blueprintSteps } from '../data/blueprint';
-import { deviceGroups } from '../data/devices';
+import { useDiscovery } from '../hooks/useDiscovery';
 import { useSimulation } from '../hooks/useSimulation';
-import type { BlueprintStep } from '../types';
+import { riskColor } from '../theme/colors';
+import type { DiscoveredDevice } from '../types';
 
 const CNSA_DEADLINE = new Date('2027-01-01');
 const TODAY = new Date();
 const WEEKS_REMAINING = Math.floor(
   (CNSA_DEADLINE.getTime() - TODAY.getTime()) / (1000 * 60 * 60 * 24 * 7),
 );
+const MIGRATION_VELOCITY = 420;
 
-const TOTAL_DEVICES = deviceGroups.reduce((s, d) => s + d.count, 0);
-const MIGRATION_VELOCITY = 420; // devices per week (static for demo)
-
-// Verdict returns a color token string — resolved in JSX via style or class
-function getProjectedCompletion(devicesReady: number): {
-  date: Date;
-  weeksLeft: number;
-  verdict: 'on-track' | 'at-risk' | 'miss';
-  label: string;
-  // color is now a CSS variable string or the single accent hex
-  color: string;
-} {
-  const remaining = TOTAL_DEVICES - devicesReady;
+function getProjection(totalDevices: number, devicesReady: number) {
+  const remaining = totalDevices - devicesReady;
   const weeksNeeded = Math.ceil(remaining / MIGRATION_VELOCITY);
-  const projectedDate = new Date(TODAY.getTime() + weeksNeeded * 7 * 24 * 60 * 60 * 1000);
+  const date = new Date(TODAY.getTime() + weeksNeeded * 7 * 24 * 60 * 60 * 1000);
   const buffer = WEEKS_REMAINING - weeksNeeded;
-
-  if (buffer >= 8) {
-    // on-track → plain off-white text, no accent needed
-    return { date: projectedDate, weeksLeft: weeksNeeded, verdict: 'on-track', label: 'On Track', color: 'var(--theme-text)' };
-  } else if (buffer >= 0) {
-    // at-risk → subdued secondary text
-    return { date: projectedDate, weeksLeft: weeksNeeded, verdict: 'at-risk', label: 'At Risk', color: 'var(--theme-text-secondary)' };
-  } else {
-    // miss → the one place the orange accent is permitted
-    return { date: projectedDate, weeksLeft: weeksNeeded, verdict: 'miss', label: 'Will Miss Deadline', color: '#E5753C' };
-  }
+  if (buffer >= 8) return { date, verdict: 'on-track' as const, label: 'On Track' };
+  if (buffer >= 0) return { date, verdict: 'at-risk' as const, label: 'At Risk' };
+  return { date, verdict: 'miss' as const, label: 'Will Miss Deadline' };
 }
 
-const stepIcons = [Radio, AlertTriangle, Server, ShieldCheck, Cpu, CheckCircle2];
+function buildRecommendations(devices: DiscoveredDevice[]) {
+  const algoGroups = new Map<string, DiscoveredDevice[]>();
+  for (const d of devices) {
+    const algo = d.currentAlgorithm;
+    if (!algoGroups.has(algo)) algoGroups.set(algo, []);
+    algoGroups.get(algo)!.push(d);
+  }
 
-function StepCard({ step, index }: { step: BlueprintStep; index: number }) {
-  const Icon = stepIcons[index];
-  const isDone = step.status === 'done';
-  const isActive = step.status === 'active';
-  const isLocked = step.status === 'locked';
-
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 16 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: index * 0.07 }}
-      className="relative flex gap-4"
-    >
-      {/* Connector line */}
-      {index < blueprintSteps.length - 1 && (
-        <div
-          className="absolute left-[21px] top-[44px] bottom-[-16px] w-0.5"
-          style={{ backgroundColor: 'var(--theme-card-border)' }}
-        />
-      )}
-
-      {/* Step icon */}
-      <div
-        className="relative w-11 h-11 rounded-full flex-shrink-0 flex items-center justify-center z-10 mt-1"
-        style={{
-          backgroundColor: 'var(--theme-card)',
-          border: `2px solid ${isActive ? 'var(--theme-text-secondary)' : 'var(--theme-card-border)'}`,
-          opacity: isLocked ? 0.55 : 1,
-        }}
-      >
-        {isDone ? (
-          <CheckCircle2 className="w-5 h-5" style={{ color: 'var(--theme-text-secondary)' }} />
-        ) : isLocked ? (
-          <Lock className="w-4 h-4" style={{ color: 'var(--theme-text-muted)' }} />
-        ) : (
-          <Icon className="w-5 h-5" style={{ color: 'var(--theme-text-muted)' }} />
-        )}
-      </div>
-
-      {/* Content */}
-      <div
-        className="flex-1 rounded-xl p-4 mb-4"
-        style={{
-          backgroundColor: 'var(--theme-card)',
-          border: `1px solid ${isActive ? 'var(--theme-text-secondary)' : 'var(--theme-card-border)'}`,
-          opacity: isLocked ? 0.6 : 1,
-        }}
-      >
-        <div className="flex items-start justify-between gap-3 mb-2">
-          <div>
-            <div className="flex items-center gap-2 mb-0.5">
-              <span
-                className="text-[10px] font-bold uppercase tracking-widest"
-                style={{ color: 'var(--theme-text-dim)' }}
-              >
-                Step {step.id}
-              </span>
-
-              {/* Done badge */}
-              {isDone && (
-                <span
-                  className="text-[10px] px-1.5 py-0.5 rounded font-semibold"
-                  style={{
-                    backgroundColor: 'var(--theme-card-border)',
-                    color: 'var(--theme-text-secondary)',
-                  }}
-                >
-                  Done
-                </span>
-              )}
-
-              {/* In Progress badge — single orange accent use */}
-              {isActive && (
-                <span
-                  className="text-[10px] px-1.5 py-0.5 rounded font-semibold"
-                  style={{ backgroundColor: 'rgba(229,117,60,0.15)', color: '#E5753C' }}
-                >
-                  In Progress
-                </span>
-              )}
-
-              {/* Upcoming badge */}
-              {isLocked && (
-                <span
-                  className="text-[10px] px-1.5 py-0.5 rounded font-semibold"
-                  style={{
-                    backgroundColor: 'var(--theme-card-border)',
-                    color: 'var(--theme-text-dim)',
-                  }}
-                >
-                  Upcoming
-                </span>
-              )}
-            </div>
-            <div className="text-sm font-semibold" style={{ color: 'var(--theme-text)' }}>
-              {step.title}
-            </div>
-          </div>
-          <div className="text-right flex-shrink-0">
-            <div className="text-sm font-bold" style={{ color: 'var(--theme-text)' }}>
-              {step.deviceCount.toLocaleString()}
-            </div>
-            <div className="text-[10px]" style={{ color: 'var(--theme-text-muted)' }}>
-              devices
-            </div>
-          </div>
-        </div>
-        <p className="text-xs leading-relaxed mb-3" style={{ color: 'var(--theme-text-secondary)' }}>
-          {step.description}
-        </p>
-        <div className="flex flex-wrap gap-2 items-center">
-          <span
-            className="flex items-center gap-1.5 text-[11px] px-2 py-1 rounded-md"
-            style={{ backgroundColor: 'var(--theme-bg)', color: 'var(--theme-text-muted)' }}
-          >
-            <Users className="w-3 h-3" />
-            {step.agentTool}
-          </span>
-          <span
-            className="flex items-center gap-1.5 text-[11px] px-2 py-1 rounded-md"
-            style={{ backgroundColor: 'var(--theme-bg)', color: 'var(--theme-text-muted)' }}
-          >
-            <Clock className="w-3 h-3" />
-            {step.timeWindowWeeks}w window
-          </span>
-          {step.deviceClasses.map((dc) => (
-            <span
-              key={dc}
-              className="text-[10px] px-2 py-1 rounded-md capitalize"
-              style={{ backgroundColor: 'var(--theme-card-border)', color: 'var(--theme-text-dim)' }}
-            >
-              {dc}
-            </span>
-          ))}
-        </div>
-      </div>
-    </motion.div>
-  );
+  return Array.from(algoGroups.entries())
+    .map(([algo, devs]) => {
+      const avgRisk = devs.reduce((s, d) => s + (d.assessment?.riskScore ?? 50), 0) / devs.length;
+      const priority: 'Critical' | 'High' | 'Medium' = avgRisk >= 75 ? 'Critical' : avgRisk >= 50 ? 'High' : 'Medium';
+      const noFw = devs.filter((d) => !d.assessment?.firmwareUpdateCapable).length;
+      const recPqc = devs[0]?.assessment?.recommendedPqc ?? 'ML-DSA-65';
+      let action = `Migrate to ${recPqc} hybrid certs via TrustEdge`;
+      if (algo.includes('PSK') || algo.includes('AES')) action = `Provision PQC identity via TrustEdge Light → ${recPqc}`;
+      if (noFw > 0) action = `${noFw} non-updatable — gateway-proxied PQC; rest → ${recPqc}`;
+      return { issue: `${algo} devices`, count: devs.length, action, priority };
+    })
+    .sort((a, b) => {
+      const order = { Critical: 0, High: 1, Medium: 2 };
+      return order[a.priority] - order[b.priority];
+    });
 }
 
 export default function BlueprintPage() {
+  const { state: disc } = useDiscovery();
   const { state, isSimulated, startSimulation, resetSimulation } = useSimulation();
   const navigate = useNavigate();
-  const devicesReady = Math.floor(TOTAL_DEVICES * (state.readinessScore / 100));
-  const projection = getProjectedCompletion(devicesReady);
-  const progressPercent = Math.round((devicesReady / TOTAL_DEVICES) * 100);
-  const noCertCount = deviceGroups
-    .filter((d) => d.certStatus === 'none')
-    .reduce((s, d) => s + d.count, 0);
+  const discovered = disc.discoveredDevices;
+  const hasDiscovery = discovered.length > 0;
+  const totalFound = discovered.length;
 
-  const circumference = 2 * Math.PI * 54;
+  const weakCrypto = discovered.filter((d) => ['RSA-1024', 'RSA-2048', 'AES-128-PSK'].includes(d.currentAlgorithm)).length;
+  const noCert = discovered.filter((d) => d.currentAlgorithm.includes('PSK') || d.currentAlgorithm.includes('AES')).length;
+
+  const devicesReady = totalFound > 0 ? Math.floor(totalFound * (state.readinessScore / 100)) : 0;
+  const projection = getProjection(totalFound || 1, devicesReady);
+  const progressPercent = totalFound > 0 ? Math.round((devicesReady / totalFound) * 100) : 0;
+  const recommendations = hasDiscovery ? buildRecommendations(discovered) : [];
+
+  const circumference = 2 * Math.PI * 44;
   const offset = circumference * (1 - progressPercent / 100);
+  const verdictColor = projection.verdict === 'miss' ? '#E5753C' : projection.verdict === 'at-risk' ? 'var(--theme-text-secondary)' : 'var(--theme-text)';
 
-  // Verdict pill styling: only "miss" gets orange; others stay monochrome
-  const verdictPillStyle: Record<string, React.CSSProperties> = {
-    'on-track': {
-      backgroundColor: 'var(--theme-card-border)',
-      color: 'var(--theme-text)',
-    },
-    'at-risk': {
-      backgroundColor: 'var(--theme-card-border)',
-      color: 'var(--theme-text-secondary)',
-    },
-    miss: {
-      backgroundColor: 'rgba(229,117,60,0.15)',
-      color: '#E5753C',
-    },
-  };
-
-  // KPI icon colors: all muted, no bright hues
-  const kpiIcons = [
-    { label: 'Total Fleet Devices', value: TOTAL_DEVICES.toLocaleString(), sub: 'across all industries', icon: Server },
-    { label: 'Devices Migrated', value: devicesReady.toLocaleString(), sub: `${TOTAL_DEVICES - devicesReady} remaining`, icon: TrendingUp },
-    { label: 'No Crypto Identity', value: noCertCount.toLocaleString(), sub: 'devices with zero certs', icon: AlertTriangle },
-    { label: 'Weeks to Deadline', value: WEEKS_REMAINING, sub: 'CNSA 2.0 — Jan 1, 2027', icon: Clock },
+  const summaryCards = [
+    { label: 'Devices', value: totalFound, icon: Server },
+    { label: 'Weak Crypto', value: weakCrypto, icon: AlertTriangle, color: riskColor('high') },
+    { label: 'No PKI Identity', value: noCert, icon: ShieldCheck, color: riskColor('critical') },
+    { label: 'Weeks to Deadline', value: WEEKS_REMAINING, icon: Clock },
   ];
 
   return (
-    <div className="p-6 space-y-6 max-w-6xl mx-auto">
-      {/* Page header */}
-      <motion.div initial={{ opacity: 0, y: -12 }} animate={{ opacity: 1, y: 0 }}>
-        <div className="flex items-center justify-between mb-1">
-          <div className="flex items-center gap-3">
-            <Map className="w-6 h-6" style={{ color: 'var(--theme-text-muted)' }} />
-            <h1 className="text-2xl font-bold" style={{ color: 'var(--theme-text)' }}>
-              PQC Readiness Blueprint
-            </h1>
-          </div>
-
-          {/* Simulation controls — inline with header */}
-          {!isSimulated && !state.isRunning && (
+    <div className="p-8 space-y-6 max-w-6xl mx-auto">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold" style={{ color: 'var(--theme-text)' }}>Readiness Blueprint</h1>
+          <p className="text-sm mt-1" style={{ color: 'var(--theme-text-muted)' }}>
+            Fleet issues, recommendations, and CNSA 2.0 deadline projection
+          </p>
+        </div>
+        <div className="flex gap-2">
+          {hasDiscovery && !isSimulated && !state.isRunning && (
             <button
+              data-tour="blueprint-apply"
               type="button"
               onClick={startSimulation}
-              className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg transition-colors"
+              className="flex items-center gap-2 px-4 py-2 text-sm font-semibold rounded-lg"
               style={{ backgroundColor: 'var(--theme-text)', color: 'var(--theme-bg)' }}
             >
-              <Play className="w-3.5 h-3.5" />
-              Simulate Migration
+              <Play className="w-4 h-4" /> Run Assessment
             </button>
           )}
           {state.isRunning && (
             <div className="flex items-center gap-3 min-w-[180px]">
-              <span className="text-[11px] whitespace-nowrap" style={{ color: 'var(--theme-text-muted)' }}>
-                {Math.round(state.progress * 100)}%
-              </span>
+              <span className="text-[11px]" style={{ color: 'var(--theme-text-muted)' }}>{Math.round(state.progress * 100)}%</span>
               <div className="flex-1 h-1.5 rounded-full overflow-hidden" style={{ backgroundColor: 'var(--theme-bar-bg)' }}>
-                <motion.div
-                  className="h-full rounded-full"
-                  style={{ width: `${state.progress * 100}%`, backgroundColor: 'var(--theme-text-secondary)' }}
-                />
+                <motion.div className="h-full rounded-full" style={{ width: `${state.progress * 100}%`, backgroundColor: 'var(--theme-text-secondary)' }} />
               </div>
             </div>
           )}
@@ -265,267 +112,196 @@ export default function BlueprintPage() {
             <button
               type="button"
               onClick={resetSimulation}
-              className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg transition-colors"
+              className="flex items-center gap-2 px-4 py-2 text-sm font-semibold rounded-lg"
               style={{ backgroundColor: 'var(--theme-card)', color: 'var(--theme-text)', border: '1px solid var(--theme-card-border)' }}
             >
-              <RotateCcw className="w-3.5 h-3.5" />
-              Reset
+              <RotateCcw className="w-4 h-4" /> Reset
             </button>
           )}
         </div>
-        <p className="text-sm" style={{ color: 'var(--theme-text-muted)' }}>
-          A device-aware, ordered migration plan. Will your fleet meet the CNSA 2.0 deadline?
-        </p>
-      </motion.div>
+      </div>
 
-      {/* Top row — projection */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-
-        {/* Progress arc */}
-        <motion.div
-          initial={{ opacity: 0, scale: 0.96 }}
-          animate={{ opacity: 1, scale: 1 }}
-          className="rounded-2xl p-6 flex flex-col items-center justify-center"
+      {!hasDiscovery && (
+        <div
+          className="rounded-xl p-10 flex flex-col items-center justify-center text-center"
           style={{ backgroundColor: 'var(--theme-card)', border: '1px solid var(--theme-card-border)' }}
         >
-          <div className="relative w-32 h-32 mb-3">
-            <svg className="w-full h-full -rotate-90" viewBox="0 0 120 120">
-              {/* Track ring */}
-              <circle
-                cx="60" cy="60" r="54"
-                fill="none"
-                strokeWidth="8"
-                style={{ stroke: 'var(--theme-bar-bg)' }}
-              />
-              {/* Progress arc — secondary text tone, or orange on miss */}
+          <Search className="w-8 h-8 mb-3" style={{ color: 'var(--theme-text-muted)' }} />
+          <h2 className="text-base font-semibold mb-1" style={{ color: 'var(--theme-text)' }}>No devices discovered yet</h2>
+          <p className="text-sm mb-4" style={{ color: 'var(--theme-text-muted)' }}>
+            Connect your platforms and run a fleet scan to generate the readiness blueprint.
+          </p>
+          <button
+            type="button"
+            onClick={() => navigate('/discovery')}
+            className="flex items-center gap-2 px-5 py-2.5 text-sm font-semibold rounded-lg"
+            style={{ backgroundColor: 'var(--theme-text)', color: 'var(--theme-bg)' }}
+          >
+            <Search className="w-4 h-4" /> Go to Discovery
+          </button>
+        </div>
+      )}
+
+      {hasDiscovery && <>
+      {/* Summary cards */}
+      <div data-tour="blueprint-summary" className="grid grid-cols-4 gap-4">
+        {summaryCards.map(({ label, value, icon: Icon, color }) => (
+          <div
+            key={label}
+            className="rounded-xl p-4"
+            style={{ backgroundColor: 'var(--theme-card)', border: '1px solid var(--theme-card-border)' }}
+          >
+            <div className="flex items-center gap-2 mb-2">
+              <Icon className="w-4 h-4" style={{ color: color ?? 'var(--theme-text-muted)' }} />
+              <span className="text-xs" style={{ color: 'var(--theme-text-muted)' }}>{label}</span>
+            </div>
+            <div className="text-2xl font-bold" style={{ color: color ?? 'var(--theme-text)' }}>
+              {typeof value === 'number' ? value.toLocaleString() : value}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Projection + Recommendations */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        {/* Projection arc */}
+        <div
+          data-tour="blueprint-projection"
+          className="rounded-xl p-5 flex flex-col items-center justify-center"
+          style={{ backgroundColor: 'var(--theme-card)', border: '1px solid var(--theme-card-border)' }}
+        >
+          <div className="relative w-24 h-24 mb-3">
+            <svg className="w-full h-full -rotate-90" viewBox="0 0 100 100">
+              <circle cx="50" cy="50" r="44" fill="none" strokeWidth="6" style={{ stroke: 'var(--theme-bar-bg)' }} />
               <motion.circle
-                cx="60" cy="60" r="54"
-                fill="none"
-                strokeWidth="8"
+                cx="50" cy="50" r="44" fill="none" strokeWidth="6"
                 stroke={projection.verdict === 'miss' ? '#E5753C' : 'var(--theme-text-secondary)'}
-                strokeLinecap="round"
-                strokeDasharray={circumference}
+                strokeLinecap="round" strokeDasharray={circumference}
                 initial={{ strokeDashoffset: circumference }}
                 animate={{ strokeDashoffset: offset }}
-                transition={{ duration: 1.2, ease: 'easeOut' }}
+                transition={{ duration: 1, ease: 'easeOut' }}
               />
             </svg>
             <div className="absolute inset-0 flex flex-col items-center justify-center">
-              <div className="text-3xl font-bold" style={{ color: 'var(--theme-text)' }}>
-                {progressPercent}%
-              </div>
-              <div className="text-[10px] uppercase tracking-widest" style={{ color: 'var(--theme-text-muted)' }}>
-                migrated
-              </div>
+              <div className="text-xl font-bold" style={{ color: 'var(--theme-text)' }}>{progressPercent}%</div>
+              <div className="text-[9px] uppercase tracking-widest" style={{ color: 'var(--theme-text-muted)' }}>ready</div>
             </div>
           </div>
-
-          {/* Verdict pill */}
-          <div
-            className="text-sm font-bold px-3 py-1 rounded-full"
-            style={verdictPillStyle[projection.verdict]}
+          <span
+            className="text-xs font-bold px-3 py-1 rounded-full"
+            style={{
+              backgroundColor: projection.verdict === 'miss' ? 'rgba(229,117,60,0.15)' : 'var(--theme-card-border)',
+              color: verdictColor,
+            }}
           >
             {projection.label}
-          </div>
-        </motion.div>
-
-        {/* KPI cards */}
-        <div className="lg:col-span-2 grid grid-cols-2 gap-3">
-          {kpiIcons.map(({ label, value, sub, icon: Icon }) => (
-            <div
-              key={label}
-              className="rounded-xl p-4 flex flex-col gap-1"
-              style={{ backgroundColor: 'var(--theme-card)', border: '1px solid var(--theme-card-border)' }}
-            >
-              <div className="flex items-center gap-2 mb-1">
-                <Icon className="w-4 h-4" style={{ color: 'var(--theme-text-muted)' }} />
-                <span className="text-xs" style={{ color: 'var(--theme-text-muted)' }}>{label}</span>
-              </div>
-              <div className="text-2xl font-bold" style={{ color: 'var(--theme-text)' }}>
-                {value}
-              </div>
-              <div className="text-[11px]" style={{ color: 'var(--theme-text-dim)' }}>{sub}</div>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Migration velocity bar */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.2 }}
-        className="rounded-xl px-5 py-4 flex items-center gap-4"
-        style={{ backgroundColor: 'var(--theme-card)', border: '1px solid var(--theme-card-border)' }}
-      >
-        <TrendingUp className="w-4 h-4 flex-shrink-0" style={{ color: 'var(--theme-text-muted)' }} />
-        <div className="flex-1">
-          <div className="flex items-center justify-between text-xs mb-1.5">
-            <span style={{ color: 'var(--theme-text-secondary)' }}>
-              Current migration velocity:{' '}
-              <strong className="blueprint-velocity-strong">{MIGRATION_VELOCITY} devices/week</strong>
-            </span>
-            {/* Projected date: orange only when missing deadline */}
-            <span
-              style={{
-                color: projection.verdict === 'miss' ? '#E5753C' : 'var(--theme-text-secondary)',
-              }}
-            >
-              Projected completion:{' '}
-              {projection.date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}
-            </span>
-          </div>
-          <div className="h-2 rounded-full overflow-hidden" style={{ backgroundColor: 'var(--theme-bar-bg)' }}>
-            <motion.div
-              className="h-full rounded-full"
-              style={{ backgroundColor: 'var(--theme-text-secondary)' }}
-              initial={{ width: 0 }}
-              animate={{ width: `${progressPercent}%` }}
-              transition={{ duration: 1, ease: 'easeOut' }}
-            />
-          </div>
+          </span>
+          <p className="text-[11px] mt-2 text-center" style={{ color: 'var(--theme-text-muted)' }}>
+            Projected: {projection.date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}
+          </p>
         </div>
 
-        {/* Action pill — orange only on miss verdict */}
+        {/* Recommendations table */}
         <div
-          className="flex-shrink-0 flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg"
-          style={
-            projection.verdict === 'miss'
-              ? { backgroundColor: 'rgba(229,117,60,0.15)', color: '#E5753C' }
-              : { backgroundColor: 'var(--theme-card-border)', color: 'var(--theme-text-secondary)' }
-          }
+          data-tour="blueprint-recommendations"
+          className="lg:col-span-2 rounded-xl overflow-hidden"
+          style={{ backgroundColor: 'var(--theme-card)', border: '1px solid var(--theme-card-border)' }}
         >
-          <ChevronRight className="w-3.5 h-3.5" />
-          {projection.verdict === 'miss' ? 'Increase velocity' : 'Maintain pace'}
-        </div>
-      </motion.div>
-
-      {/* Blueprint steps */}
-      <div>
-        <h2 className="text-base font-semibold mb-4" style={{ color: 'var(--theme-text)' }}>
-          Migration Blueprint — Ordered Steps
-        </h2>
-        <div>
-          {blueprintSteps.map((step, i) => (
-            <StepCard key={step.id} step={step} index={i} />
-          ))}
+          <div className="px-5 py-3" style={{ borderBottom: '1px solid var(--theme-card-border)' }}>
+            <h2 className="text-sm font-semibold" style={{ color: 'var(--theme-text)' }}>Recommendations</h2>
+          </div>
+          <table className="w-full text-xs">
+            <thead>
+              <tr style={{ borderBottom: '1px solid var(--theme-card-border)' }}>
+                {['Issue', 'Devices', 'Action', 'Priority'].map((h) => (
+                  <th key={h} className="text-left py-2.5 px-5 font-medium" style={{ color: 'var(--theme-text-muted)' }}>{h}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {recommendations.map((r, i) => (
+                <motion.tr
+                  key={r.issue}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: i * 0.05 }}
+                  style={{ borderBottom: '1px solid var(--theme-card-border)' }}
+                >
+                  <td className="py-2.5 px-5 font-medium" style={{ color: 'var(--theme-text)' }}>{r.issue}</td>
+                  <td className="py-2.5 px-5" style={{ color: 'var(--theme-text-secondary)' }}>{r.count}</td>
+                  <td className="py-2.5 px-5" style={{ color: 'var(--theme-text-secondary)' }}>{r.action}</td>
+                  <td className="py-2.5 px-5">
+                    <span
+                      className="px-2 py-0.5 rounded text-[10px] font-semibold"
+                      style={{
+                        color: r.priority === 'Critical' ? riskColor('critical') : r.priority === 'High' ? riskColor('high') : 'var(--theme-text-muted)',
+                        backgroundColor: r.priority === 'Critical' ? `${riskColor('critical')}18` : r.priority === 'High' ? `${riskColor('high')}18` : 'var(--theme-card-inner)',
+                      }}
+                    >
+                      {r.priority}
+                    </span>
+                  </td>
+                </motion.tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       </div>
 
-      {/* Two-agent strategy */}
-      <motion.div
-        initial={{ opacity: 0, y: 12 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.4 }}
-      >
-        <h2 className="text-base font-semibold mb-4" style={{ color: 'var(--theme-text)' }}>
-          Two-Agent Strategy
-        </h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-
-          {/* TrustEdge Agent — neutral border, no blue */}
-          <div
-            className="rounded-2xl p-5"
-            style={{ backgroundColor: 'var(--theme-card)', border: '1px solid var(--theme-card-border)' }}
-          >
-            <div className="flex items-center gap-3 mb-3">
-              <div className="w-9 h-9 rounded-lg flex items-center justify-center blueprint-agent-icon-bg">
-                <ShieldCheck className="w-5 h-5" style={{ color: 'var(--theme-text-muted)' }} />
-              </div>
-              <div>
-                <div className="text-sm font-bold" style={{ color: 'var(--theme-text)' }}>TrustEdge Agent</div>
-                <div className="text-[11px]" style={{ color: 'var(--theme-text-secondary)' }}>
-                  Full-capability · Capable devices
-                </div>
-              </div>
-            </div>
-            <ul className="space-y-2">
-              {[
-                'Certificate lifecycle management (issue, renew, revoke)',
-                'Full PQC cert deployment — hybrid and full-PQC modes',
-                'Policy enforcement & compliance attestation',
-                'Automatic rollback on failed deployment',
-                'Real-time status reporting to Readiness Dashboard',
-              ].map((item) => (
-                <li
-                  key={item}
-                  className="flex items-start gap-2 text-xs"
-                  style={{ color: 'var(--theme-text-secondary)' }}
-                >
-                  <CheckCircle2
-                    className="w-3.5 h-3.5 flex-shrink-0 mt-0.5"
-                    style={{ color: 'var(--theme-text-muted)' }}
-                  />
-                  {item}
-                </li>
-              ))}
-            </ul>
-            <div
-              className="mt-4 rounded-lg px-3 py-2 text-xs"
-              style={{ backgroundColor: 'var(--theme-bg)', color: 'var(--theme-text-muted)' }}
-            >
-              Requires: ≥256KB RAM · Firmware update capable · Network reachable
-            </div>
+      {/* Discovered device issues */}
+      {hasDiscovery && (
+        <div
+          className="rounded-xl overflow-hidden"
+          style={{ backgroundColor: 'var(--theme-card)', border: '1px solid var(--theme-card-border)' }}
+        >
+          <div className="px-5 py-3" style={{ borderBottom: '1px solid var(--theme-card-border)' }}>
+            <h2 className="text-sm font-semibold" style={{ color: 'var(--theme-text)' }}>
+              Discovered Device Issues
+            </h2>
           </div>
-
-          {/* Kernel Module + SDK — neutral border, orange accent only on icon */}
-          <motion.button
-            type="button"
-            onClick={() => navigate('/kernel-module')}
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-            className="rounded-2xl p-5 text-left cursor-pointer group"
-            style={{ backgroundColor: 'var(--theme-card)', border: '1px solid var(--theme-card-border)' }}
-          >
-            <div className="flex items-center gap-3 mb-3">
-              <div className="w-9 h-9 rounded-lg flex items-center justify-center blueprint-kernel-icon-bg">
-                {/* One deliberate orange accent: the constrained-device icon */}
-                <Cpu className="w-5 h-5" style={{ color: '#E5753C' }} />
-              </div>
-              <div>
-                <div className="text-sm font-bold" style={{ color: 'var(--theme-text)' }}>Kernel Module + SDK</div>
-                <div className="text-[11px]" style={{ color: 'var(--theme-text-secondary)' }}>
-                  Lightweight · Brownfield devices
-                </div>
-              </div>
-            </div>
-            <ul className="space-y-2">
-              {[
-                'Telemetry-only: cert status, RAM, CPU, firmware hash',
-                'Minimal footprint — as low as 8KB RAM, no TrustEdge dependency',
-                'SDK in Python, C, Go, Rust, Java, Node.js',
-                'Supports ML-KEM-512 + FN-DSA-512 on constrained hardware',
-                'Chunked data upload — battery and bandwidth efficient',
-              ].map((item) => (
-                <li
-                  key={item}
-                  className="flex items-start gap-2 text-xs"
-                  style={{ color: 'var(--theme-text-secondary)' }}
-                >
-                  <CheckCircle2
-                    className="w-3.5 h-3.5 flex-shrink-0 mt-0.5"
-                    style={{ color: 'var(--theme-text-muted)' }}
-                  />
-                  {item}
-                </li>
-              ))}
-            </ul>
-            <div
-              className="mt-4 rounded-lg px-3 py-2 text-xs"
-              style={{ backgroundColor: 'var(--theme-bg)', color: 'var(--theme-text-muted)' }}
-            >
-              Works on: ≥8KB RAM · No OS requirement · UART / BLE / NB-IoT
-            </div>
-            <div
-              className="mt-3 text-[11px] font-semibold flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity"
-              style={{ color: '#E5753C' }}
-            >
-              Explore <ArrowRight className="w-3 h-3" />
-            </div>
-          </motion.button>
-
+          <table className="w-full text-xs">
+            <thead>
+              <tr style={{ borderBottom: '1px solid var(--theme-card-border)' }}>
+                {['Device', 'Algorithm', 'Risk', 'Recommended PQC', 'FW Update'].map((h) => (
+                  <th key={h} className="text-left py-2.5 px-5 font-medium" style={{ color: 'var(--theme-text-muted)' }}>{h}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {discovered
+                .filter((d) => d.assessment && (d.assessment.riskLevel === 'critical' || d.assessment.riskLevel === 'high'))
+                .map((d, i) => (
+                  <motion.tr
+                    key={d.id}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: i * 0.03 }}
+                    style={{ borderBottom: '1px solid var(--theme-card-border)' }}
+                  >
+                    <td className="py-2.5 px-5">
+                      <div className="font-medium" style={{ color: 'var(--theme-text)' }}>{d.hostname}</div>
+                      <div className="text-[10px]" style={{ color: 'var(--theme-text-dim)' }}>{d.deviceType}</div>
+                    </td>
+                    <td className="py-2.5 px-5" style={{ color: 'var(--theme-text-secondary)' }}>{d.currentAlgorithm}</td>
+                    <td className="py-2.5 px-5">
+                      <span
+                        className="px-2 py-0.5 rounded text-[10px] font-semibold capitalize"
+                        style={{ color: riskColor(d.assessment!.riskLevel), backgroundColor: `${riskColor(d.assessment!.riskLevel)}18` }}
+                      >
+                        {d.assessment!.riskLevel}
+                      </span>
+                    </td>
+                    <td className="py-2.5 px-5" style={{ color: 'var(--theme-text-secondary)' }}>{d.assessment!.recommendedPqc}</td>
+                    <td className="py-2.5 px-5" style={{ color: d.assessment!.firmwareUpdateCapable ? 'var(--theme-text-secondary)' : riskColor('critical') }}>
+                      {d.assessment!.firmwareUpdateCapable ? 'Yes' : 'No'}
+                    </td>
+                  </motion.tr>
+                ))}
+            </tbody>
+          </table>
         </div>
-      </motion.div>
+      )}
+      </>}
     </div>
   );
 }

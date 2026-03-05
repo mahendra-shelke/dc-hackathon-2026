@@ -3,8 +3,10 @@ import { X, ChevronLeft, ChevronRight, BookOpen } from 'lucide-react';
 import { useStory } from '../../hooks/useStory';
 
 export default function StoryPanel() {
-  const { isOpen, activeChapter, chapters, closePanel, goToChapter, nextChapter, prevChapter } =
-    useStory();
+  const {
+    isOpen, activeChapter, activeAnnotation, chapters, currentAnnotations,
+    closePanel, goToChapter, nextAnnotation, prevAnnotation,
+  } = useStory();
 
   return (
     <AnimatePresence>
@@ -37,10 +39,10 @@ export default function StoryPanel() {
                 </div>
                 <div>
                   <div className="text-sm font-bold" style={{ color: 'var(--theme-text)' }}>
-                    Story Mode
+                    Guided Tour
                   </div>
                   <div className="text-[10px] uppercase tracking-widest" style={{ color: 'var(--theme-text-muted)' }}>
-                    Executive Narrative
+                    Step-by-step walkthrough
                   </div>
                 </div>
               </div>
@@ -116,6 +118,32 @@ export default function StoryPanel() {
                           >
                             {chapter.detail}
                           </div>
+
+                          {/* Current annotation callout */}
+                          {currentAnnotations.length > 0 && currentAnnotations[activeAnnotation] && (
+                            <div
+                              className="mt-3 rounded-lg p-3"
+                              style={{
+                                backgroundColor: 'var(--theme-card-inner)',
+                                border: '1px solid var(--theme-card-border)',
+                              }}
+                            >
+                              <div className="flex items-center justify-between mb-1.5">
+                                <span
+                                  className="text-[10px] uppercase tracking-widest font-semibold"
+                                  style={{ color: 'var(--theme-text-muted)' }}
+                                >
+                                  Focus {activeAnnotation + 1}/{currentAnnotations.length}
+                                </span>
+                              </div>
+                              <div className="text-xs font-bold mb-1" style={{ color: 'var(--theme-text)' }}>
+                                {currentAnnotations[activeAnnotation].title}
+                              </div>
+                              <div className="text-[11px] leading-relaxed" style={{ color: 'var(--theme-text-muted)' }}>
+                                {currentAnnotations[activeAnnotation].description}
+                              </div>
+                            </div>
+                          )}
                         </motion.div>
                       )}
                     </AnimatePresence>
@@ -134,9 +162,11 @@ export default function StoryPanel() {
                 <span>
                   Chapter {activeChapter} of {chapters.length}
                 </span>
-                <span style={{ color: 'var(--theme-text-secondary)' }}>
-                  {Math.round((activeChapter / chapters.length) * 100)}% complete
-                </span>
+                {currentAnnotations.length > 0 && (
+                  <span style={{ color: 'var(--theme-text-secondary)' }}>
+                    Focus {activeAnnotation + 1}/{currentAnnotations.length}
+                  </span>
+                )}
               </div>
               <div className="h-1 rounded-full overflow-hidden" style={{ backgroundColor: 'var(--theme-bar-bg)' }}>
                 <motion.div
@@ -150,8 +180,8 @@ export default function StoryPanel() {
               {/* Prev / Next */}
               <div className="flex gap-2">
                 <button
-                  onClick={prevChapter}
-                  disabled={activeChapter === 1}
+                  onClick={prevAnnotation}
+                  disabled={activeChapter === 1 && activeAnnotation === 0}
                   className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg text-sm font-medium transition-colors disabled:opacity-30"
                   style={{
                     backgroundColor: 'var(--theme-card)',
@@ -163,8 +193,8 @@ export default function StoryPanel() {
                   Back
                 </button>
                 <button
-                  onClick={nextChapter}
-                  disabled={activeChapter === chapters.length}
+                  onClick={nextAnnotation}
+                  disabled={activeChapter === chapters.length && activeAnnotation >= currentAnnotations.length - 1}
                   className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg text-sm font-medium transition-colors disabled:opacity-40"
                   style={{
                     backgroundColor: 'var(--theme-text)',

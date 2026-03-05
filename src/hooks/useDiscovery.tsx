@@ -8,7 +8,6 @@ import {
   simulatedDiscoveryDevices,
   generateAssessment,
   generateDeviceGroups,
-  getDiscoverySubnets,
 } from '../data/connectors';
 import { useSimulation } from './useSimulation';
 
@@ -90,54 +89,54 @@ export function DiscoveryProvider({ children }: { children: ReactNode }) {
   const startDiscovery = useCallback(() => {
     const connectedIds = new Set(state.connectors.filter((c) => c.status === 'connected').map((c) => c.id));
     const devicesToDiscover = simulatedDiscoveryDevices.filter((d) => connectedIds.has(d.connectorId));
-    const subnets = getDiscoverySubnets();
 
     setState((prev) => ({
       ...prev,
       pipelineStep: 'discovering',
       discoveryProgress: 0,
       discoveredDevices: [],
-      logEntries: addLog(prev.logEntries, 'info', `[DTM] Initializing discovery scan across ${connectedIds.size} platform(s)...`),
+      logEntries: addLog(prev.logEntries, 'info', `[TrustCore] Scanning ${connectedIds.size} platform(s)...`),
     }));
 
     let index = 0;
     const total = devicesToDiscover.length;
 
-    // Log subnet scanning first
-    setTimeout(() => {
-      setState((prev) => ({
-        ...prev,
-        logEntries: addLog(prev.logEntries, 'info', `[DTM] Scanning subnets: ${subnets.slice(0, 3).join(', ')}...`),
-      }));
-    }, 300);
-
     intervalRef.current = setInterval(() => {
       if (index >= total) {
         clearInterval(intervalRef.current);
-        setState((prev) => ({
-          ...prev,
-          discoveryProgress: 100,
-          logEntries: addLog(prev.logEntries, 'success', `[DTM] Discovery complete. ${total} devices found across ${connectedIds.size} platform(s).`),
-        }));
+        setState((prev) => {
+          const criticalCount = prev.discoveredDevices.filter((d) => d.assessment?.riskLevel === 'critical').length;
+          const highCount = prev.discoveredDevices.filter((d) => d.assessment?.riskLevel === 'high').length;
+          const groups = generateDeviceGroups(prev.discoveredDevices);
+          addDiscoveredDevices(groups);
+          return {
+            ...prev,
+            pipelineStep: 'complete',
+            discoveryProgress: 100,
+            isComplete: true,
+            logEntries: addLog(prev.logEntries, 'success', `[TrustCore] Scan complete. ${total} devices — ${criticalCount} critical, ${highCount} high risk.`),
+          };
+        });
         return;
       }
 
       const device = devicesToDiscover[index];
+      const assessment = generateAssessment(device);
       index++;
 
       setState((prev) => ({
         ...prev,
-        discoveredDevices: [...prev.discoveredDevices, device],
+        discoveredDevices: [...prev.discoveredDevices, { ...device, assessment }],
         discoveryProgress: Math.round((index / total) * 100),
         logEntries: addLog(
           prev.logEntries,
-          'info',
-          `[DTM] Found ${device.hostname} at ${device.ipAddress} — ${device.currentAlgorithm} (${device.keySize}-bit)`,
+          assessment.riskLevel === 'critical' ? 'warning' : 'info',
+          `[TrustCore] ${device.hostname} — ${device.currentAlgorithm} — Risk: ${assessment.riskScore}/100`,
           device.id,
         ),
       }));
-    }, 150);
-  }, [state.connectors]);
+    }, 200);
+  }, [state.connectors, addDiscoveredDevices]);
 
   const startAssessment = useCallback(() => {
     setState((prev) => ({

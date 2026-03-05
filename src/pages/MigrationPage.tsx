@@ -13,7 +13,7 @@ const productCards = [
   },
   {
     phase: 'Testing & Validation',
-    product: 'TrustCore SDK',
+    product: 'TrustEdge Light',
     icon: Code,
     color: '#8B5CF6',
     description: 'Embeddable PQC cryptographic library for device firmware. Supports ML-DSA, ML-KEM, and hybrid modes.',

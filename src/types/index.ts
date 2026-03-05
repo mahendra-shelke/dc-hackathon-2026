@@ -84,7 +84,7 @@ export interface SimulationState {
 
 // --- Discovery Connector Types ---
 
-export type ConnectorType = 'azure-iot' | 'aws-iot' | 'scada-opcua' | 'matter-thread' | 'custom-api';
+export type ConnectorType = 'azure-iot' | 'aws-iot' | 'azure-eventgrid' | 'trustcore-sdk' | 'custom-api';
 
 export type ConnectorStatus = 'disconnected' | 'connecting' | 'connected' | 'error';
 
@@ -98,6 +98,7 @@ export interface ConnectorConfig {
   protocol: string;
   devicesDiscovered: number;
   color: string;
+  isNew?: boolean;
 }
 
 export type DiscoveryPipelineStep = 'idle' | 'discovering' | 'assessing' | 'deploying' | 'complete';
@@ -162,13 +163,21 @@ export interface DiscoveryState {
 export type CertStatus = 'none' | 'classical' | 'hybrid' | 'pqc';
 
 // --- Story Mode ---
+export interface TourAnnotation {
+  target: string;                                     // matches data-tour="..." on a DOM element
+  title: string;                                      // short callout heading
+  description: string;                                // 1-2 sentence explanation
+  position?: 'top' | 'bottom' | 'left' | 'right';    // callout placement relative to target
+}
+
 export interface StoryChapter {
   id: number;
   title: string;
   tagline: string;
   detail: string;
   route: string;
-  tabHint?: string; // optional tab to activate on the target page
+  tabHint?: string;
+  annotations?: TourAnnotation[];
 }
 
 // --- Kernel Agent ---

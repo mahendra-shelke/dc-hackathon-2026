@@ -2,10 +2,13 @@ import { useState } from 'react';
 import GlassCard from '../components/common/GlassCard';
 import { CertSizeBars, ChainStackSVG, HandshakeComparison } from '../components/charts/CertSizeComparison';
 import { certComparisons } from '../data/certificates';
+import { useDiscovery } from '../hooks/useDiscovery';
 import { formatBytes } from '../utils';
 
 export default function CertificatePage() {
-  const [deviceCount, setDeviceCount] = useState(10000);
+  const { state: disc } = useDiscovery();
+  const fleetSize = disc.discoveredDevices.length;
+  const [deviceCount, setDeviceCount] = useState(fleetSize > 0 ? Math.min(fleetSize, 50000) : 10000);
   const [handshakesPerDay, setHandshakesPerDay] = useState(24);
 
   const ecdsa = certComparisons[1];

@@ -6,7 +6,7 @@ import type { DiscoveryPipelineStep } from '../../types';
 
 const steps = [
   { key: 'discovering' as const, label: 'DTM Discovery', icon: Search, product: 'Device Trust Manager' },
-  { key: 'assessing' as const, label: 'TrustCore Assessment', icon: ShieldCheck, product: 'TrustCore SDK' },
+  { key: 'assessing' as const, label: 'TrustEdge Light Assessment', icon: ShieldCheck, product: 'TrustEdge Light' },
   { key: 'deploying' as const, label: 'TrustEdge Deployment', icon: Rocket, product: 'TrustEdge' },
 ];
 
