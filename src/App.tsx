@@ -3,6 +3,7 @@ import { ThemeProvider } from './hooks/useTheme';
 import { SimulationProvider } from './hooks/useSimulation';
 import { DiscoveryProvider } from './hooks/useDiscovery';
 import { StoryProvider } from './hooks/useStory';
+import { TrustEdgeProvider } from './hooks/useTrustEdge';
 import AppShell from './components/layout/AppShell';
 import LandingPage from './pages/LandingPage';
 import ExecutiveDashboard from './pages/ExecutiveDashboard';
@@ -20,6 +21,7 @@ export default function App() {
       <ThemeProvider>
         <SimulationProvider>
           <DiscoveryProvider>
+            <TrustEdgeProvider>
             <StoryProvider>
               <Routes>
                 <Route element={<AppShell />}>
@@ -35,6 +37,7 @@ export default function App() {
                 </Route>
               </Routes>
             </StoryProvider>
+            </TrustEdgeProvider>
           </DiscoveryProvider>
         </SimulationProvider>
       </ThemeProvider>
