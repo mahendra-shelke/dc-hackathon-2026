@@ -14,6 +14,7 @@ import CertificatePage from './pages/CertificatePage';
 import MigrationPage from './pages/MigrationPage';
 import DiscoveryPage from './pages/DiscoveryPage';
 import BlueprintPage from './pages/BlueprintPage';
+import KernelModulePage from './pages/KernelModulePage';
 
 export default function App() {
   return (
@@ -26,6 +27,7 @@ export default function App() {
               <Routes>
                 <Route element={<AppShell />}>
                   <Route index element={<LandingPage />} />
+                  <Route path="kernel-module" element={<KernelModulePage />} />
                   <Route path="executive" element={<ExecutiveDashboard />} />
                   <Route path="discovery" element={<DiscoveryPage />} />
                   <Route path="hndl" element={<HndlRiskPage />} />

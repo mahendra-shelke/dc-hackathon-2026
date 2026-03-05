@@ -13,6 +13,14 @@ export const storyChapters: StoryChapter[] = [
   },
   {
     id: 2,
+    title: 'Reaching the Unreachable',
+    tagline: 'Brownfield devices can\'t run a full agent — the Kernel Module finds them anyway.',
+    detail:
+      'Legacy PLCs, smart meters, medical sensors, SCADA terminals — these constrained devices have as little as 8KB RAM. They can\'t run TrustEdge. Our lightweight Kernel Module deploys on this hardware and probes local certificate stores: X.509, DER, PEM. It reports cert status, algorithm, serial number, issuer, firmware hash, and heartbeat. Devices with zero cryptographic identity are flagged instantly. The SDK (Python, C, Go) lets you embed cert discovery into existing firmware.',
+    route: '/kernel-module',
+  },
+  {
+    id: 3,
     title: 'Discovering the Truth',
     tagline: 'Our kernel module reaches devices TrustEdge can\'t.',
     detail:
@@ -20,7 +28,7 @@ export const storyChapters: StoryChapter[] = [
     route: '/discovery',
   },
   {
-    id: 3,
+    id: 4,
     title: 'The Clock Is Ticking',
     tagline: 'RSA and ECDSA have expiry dates. Most of your fleet runs on them.',
     detail:
@@ -29,7 +37,7 @@ export const storyChapters: StoryChapter[] = [
     tabHint: 'deprecation',
   },
   {
-    id: 4,
+    id: 5,
     title: 'Your Readiness Blueprint',
     tagline: 'An ordered, device-aware migration plan with a deadline tracker.',
     detail:
@@ -37,7 +45,7 @@ export const storyChapters: StoryChapter[] = [
     route: '/blueprint',
   },
   {
-    id: 5,
+    id: 6,
     title: 'Pick the Right Algorithm',
     tagline: 'Not every device can run ML-DSA-87. Device Advisor picks the right fit.',
     detail:
@@ -46,7 +54,7 @@ export const storyChapters: StoryChapter[] = [
     tabHint: 'advisor',
   },
   {
-    id: 6,
+    id: 7,
     title: 'Prove It Works',
     tagline: 'Hybrid certs bridge the gap. The Q-Shield demo shows it live.',
     detail:
