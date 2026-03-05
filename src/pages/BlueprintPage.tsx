@@ -2,8 +2,9 @@ import { motion } from 'framer-motion';
 import {
   Map, CheckCircle2, Lock, Server, Cpu, Radio,
   ShieldCheck, AlertTriangle, TrendingUp, Clock, Users,
-  ChevronRight, Play, RotateCcw,
+  ChevronRight, Play, RotateCcw, ArrowRight,
 } from 'lucide-react';
+import { useNavigate } from 'react-router';
 import { blueprintSteps } from '../data/blueprint';
 import { deviceGroups } from '../data/devices';
 import { useSimulation } from '../hooks/useSimulation';
@@ -188,6 +189,7 @@ function StepCard({ step, index }: { step: BlueprintStep; index: number }) {
 
 export default function BlueprintPage() {
   const { state, isSimulated, startSimulation, resetSimulation } = useSimulation();
+  const navigate = useNavigate();
   const devicesReady = Math.floor(TOTAL_DEVICES * (state.readinessScore / 100));
   const projection = getProjectedCompletion(devicesReady);
   const progressPercent = Math.round((devicesReady / TOTAL_DEVICES) * 100);
@@ -467,8 +469,12 @@ export default function BlueprintPage() {
           </div>
 
           {/* Kernel Module + SDK — neutral border, orange accent only on icon */}
-          <div
-            className="rounded-2xl p-5"
+          <motion.button
+            type="button"
+            onClick={() => navigate('/kernel-module')}
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            className="rounded-2xl p-5 text-left cursor-pointer group"
             style={{ backgroundColor: 'var(--theme-card)', border: '1px solid var(--theme-card-border)' }}
           >
             <div className="flex items-center gap-3 mb-3">
@@ -487,7 +493,7 @@ export default function BlueprintPage() {
               {[
                 'Telemetry-only: cert status, RAM, CPU, firmware hash',
                 'Minimal footprint — as low as 8KB RAM, no TrustEdge dependency',
-                'SDK in Python, C, Go — embed into existing firmware',
+                'SDK in Python, C, Go, Rust, Java, Node.js',
                 'Supports ML-KEM-512 + FN-DSA-512 on constrained hardware',
                 'Chunked data upload — battery and bandwidth efficient',
               ].map((item) => (
@@ -510,7 +516,13 @@ export default function BlueprintPage() {
             >
               Works on: ≥8KB RAM · No OS requirement · UART / BLE / NB-IoT
             </div>
-          </div>
+            <div
+              className="mt-3 text-[11px] font-semibold flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity"
+              style={{ color: '#E5753C' }}
+            >
+              Explore <ArrowRight className="w-3 h-3" />
+            </div>
+          </motion.button>
 
         </div>
       </motion.div>

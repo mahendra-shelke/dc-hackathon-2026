@@ -13,13 +13,6 @@ import type { ClassicalAlgoDeprecation } from '../types';
 type Tab = 'matrix' | 'deprecation' | 'advisor';
 
 const TODAY_YEAR = new Date().getFullYear();
-const TODAY_MS = new Date().getTime();
-
-function daysUntil(year: number | null): number | null {
-  if (!year) return null;
-  const target = new Date(`${year}-01-01`).getTime();
-  return Math.max(0, Math.ceil((target - TODAY_MS) / (1000 * 60 * 60 * 24)));
-}
 
 function statusIcon(status: ClassicalAlgoDeprecation['status']) {
   switch (status) {
@@ -36,47 +29,15 @@ function statusIcon(status: ClassicalAlgoDeprecation['status']) {
 
 function statusColor(status: ClassicalAlgoDeprecation['status']): string {
   switch (status) {
-    case 'active':     return 'var(--theme-text-secondary)';
+    case 'active': return 'var(--theme-text-secondary)';
     case 'deprecated': return '#E5753C';
     case 'disallowed': return 'var(--theme-text-muted)';
-    case 'sunset':     return 'var(--theme-text-dim)';
-  }
-}
-
-/**
- * Returns a semi-transparent background and border color for a timeline bar
- * without relying on hex-alpha string concatenation (which breaks CSS vars).
- */
-function statusBarStyle(status: ClassicalAlgoDeprecation['status']): {
-  backgroundColor: string;
-  border: string;
-} {
-  switch (status) {
-    case 'active':
-      return {
-        backgroundColor: 'rgba(160, 160, 168, 0.14)',
-        border: '1px solid rgba(160, 160, 168, 0.22)',
-      };
-    case 'deprecated':
-      return {
-        backgroundColor: 'rgba(229, 117, 60, 0.12)',
-        border: '1px solid rgba(229, 117, 60, 0.22)',
-      };
-    case 'disallowed':
-      return {
-        backgroundColor: 'rgba(108, 108, 116, 0.14)',
-        border: '1px solid rgba(108, 108, 116, 0.22)',
-      };
-    case 'sunset':
-      return {
-        backgroundColor: 'rgba(76, 76, 84, 0.14)',
-        border: '1px solid rgba(76, 76, 84, 0.22)',
-      };
+    case 'sunset': return 'var(--theme-text-dim)';
   }
 }
 
 const TIMELINE_START = 2022;
-const TIMELINE_END = 2031;
+const TIMELINE_END = 2036;
 const TIMELINE_SPAN = TIMELINE_END - TIMELINE_START;
 
 function yearToPercent(year: number): number {
@@ -117,7 +78,7 @@ function DeprecationTimeline() {
       </div>
 
       {/* Timeline chart header */}
-      <div className="rounded-xl p-5" style={{ backgroundColor: 'var(--theme-card)', border: '1px solid var(--theme-card-border)' }}>
+      <div className="rounded-xl p-5 overflow-hidden" style={{ backgroundColor: 'var(--theme-card)', border: '1px solid var(--theme-card-border)' }}>
         <h3 className="text-sm font-semibold mb-4" style={{ color: 'var(--theme-text)' }}>
           Classical Algorithm Deprecation Timeline
         </h3>
@@ -158,42 +119,83 @@ function DeprecationTimeline() {
         {/* Algorithm rows */}
         <div className="space-y-3">
           {classicalAlgoDeprecations.map((algo) => {
-            const days = daysUntil(algo.disallowedYear);
             const color = statusColor(algo.status);
-            const barStyle = statusBarStyle(algo.status);
 
-            // Active bar spans from start to disallowed/sunset
+            // Bar spans from timeline start to the disallowed year (or sunset or end)
             const barEnd = algo.sunsetYear ?? algo.disallowedYear ?? TIMELINE_END;
-            const barStart = TIMELINE_START;
-            const barLeft = yearToPercent(barStart);
-            const barWidth = yearToPercent(barEnd) - barLeft;
+            const barLeft = 0; // always start from TIMELINE_START
+            const barWidth = yearToPercent(barEnd);
+
+            // Deprecated section: from deprecatedYear to disallowedYear
+            const hasDeprecatedSection = algo.deprecatedYear && algo.disallowedYear && algo.deprecatedYear < algo.disallowedYear;
+            const deprecatedLeft = algo.deprecatedYear ? yearToPercent(algo.deprecatedYear) : 0;
+            const deprecatedWidth = hasDeprecatedSection
+              ? yearToPercent(algo.disallowedYear!) - deprecatedLeft
+              : 0;
 
             return (
-              <div key={algo.id} className="flex items-center gap-3">
+              <div key={algo.id} className="flex items-center gap-3 overflow-hidden">
                 <div className="w-32 flex-shrink-0 text-right">
-                  <div className="text-xs font-semibold" style={{ color: 'var(--theme-text)' }}>
+                  <div className="text-xs font-semibold truncate" style={{ color: 'var(--theme-text)' }}>
                     {algo.name}
                   </div>
-                  <div className="text-[10px]" style={{ color: 'var(--theme-text-dim)' }}>
+                  <div className="text-[10px] truncate" style={{ color: 'var(--theme-text-dim)' }}>
                     {algo.keySize}
                   </div>
                 </div>
-                <div className="flex-1 relative h-6">
+                <div className="flex-1 min-w-0 relative h-6">
                   {/* Background track */}
                   <div
                     className="absolute inset-y-1 inset-x-0 rounded-full"
                     style={{ backgroundColor: 'var(--theme-bar-bg)' }}
                   />
-                  {/* Active span */}
-                  <div
-                    className="absolute inset-y-1 rounded-full"
-                    style={{
-                      left: `${barLeft}%`,
-                      width: `${barWidth}%`,
-                      ...barStyle,
-                    }}
-                  />
-                  {/* Disallowed marker */}
+                  {/* Allowed span (start → deprecatedYear) */}
+                  {algo.deprecatedYear && (
+                    <div
+                      className="absolute inset-y-1 rounded-l-full"
+                      style={{
+                        left: `${barLeft}%`,
+                        width: `${deprecatedLeft}%`,
+                        backgroundColor: 'rgba(160, 160, 168, 0.14)',
+                        border: '1px solid rgba(160, 160, 168, 0.22)',
+                      }}
+                    />
+                  )}
+                  {/* Deprecated span (deprecatedYear → disallowedYear) — orange-tinted */}
+                  {hasDeprecatedSection && (
+                    <div
+                      className="absolute inset-y-1"
+                      style={{
+                        left: `${deprecatedLeft}%`,
+                        width: `${deprecatedWidth}%`,
+                        backgroundColor: 'rgba(229, 117, 60, 0.12)',
+                        border: '1px solid rgba(229, 117, 60, 0.22)',
+                      }}
+                    />
+                  )}
+                  {/* Sunset bar (already past) — dim */}
+                  {algo.status === 'sunset' && (
+                    <div
+                      className="absolute inset-y-1 rounded-full"
+                      style={{
+                        left: `${barLeft}%`,
+                        width: `${barWidth}%`,
+                        backgroundColor: 'rgba(76, 76, 84, 0.14)',
+                        border: '1px solid rgba(76, 76, 84, 0.22)',
+                      }}
+                    />
+                  )}
+                  {/* Deprecated year marker (dashed) */}
+                  {algo.deprecatedYear && algo.status !== 'sunset' && (
+                    <div
+                      className="absolute top-0 bottom-0 w-px"
+                      style={{
+                        left: `${yearToPercent(algo.deprecatedYear)}%`,
+                        borderLeft: '1px dashed var(--theme-text-muted)',
+                      }}
+                    />
+                  )}
+                  {/* Disallowed year marker (solid) */}
                   {algo.disallowedYear && (
                     <div
                       className="absolute top-0 bottom-0 w-0.5"
@@ -204,18 +206,18 @@ function DeprecationTimeline() {
                     />
                   )}
                 </div>
-                <div className="w-28 flex-shrink-0 flex items-center gap-1.5">
+                <div className="w-28 flex-shrink-0 flex items-center gap-1.5 overflow-hidden">
                   {statusIcon(algo.status)}
-                  <div>
-                    <div className="text-[10px] font-semibold capitalize" style={{ color }}>
+                  <div className="truncate">
+                    <div className="text-[10px] font-semibold capitalize truncate" style={{ color }}>
                       {algo.status}
                     </div>
-                    {days !== null && days > 0 && (
-                      <div className="text-[9px]" style={{ color: 'var(--theme-text-dim)' }}>
-                        {days}d left
+                    {algo.disallowedYear && algo.disallowedYear > TODAY_YEAR && (
+                      <div className="text-[9px] truncate" style={{ color: 'var(--theme-text-dim)' }}>
+                        by {algo.disallowedYear}
                       </div>
                     )}
-                    {days === 0 && (
+                    {algo.status === 'sunset' && (
                       <div className="text-[9px]" style={{ color: '#E5753C' }}>Now</div>
                     )}
                   </div>
