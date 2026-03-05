@@ -9,12 +9,12 @@ import DigiCertLogo from '../icons/DigiCertLogo';
 import { useSimulation } from '../../hooks/useSimulation';
 import { useTheme, themes } from '../../hooks/useTheme';
 import { useStory } from '../../hooks/useStory';
-import { useTrustEdge } from '../../hooks/useTrustEdge';
 import { useState } from 'react';
 
 // Core demo pages — keep this list short and executive-friendly
 const navItems = [
   { to: '/', icon: LayoutDashboard, label: 'Dashboard' },
+  { to: '/trustedge', icon: Shield, label: 'TrustEdge' },
   { to: '/kernel-module', icon: Cpu, label: 'Kernel Module + SDK' },
   { to: '/discovery', icon: Radar, label: 'Discovery' },
   { to: '/blueprint', icon: Map, label: 'Readiness Blueprint' },
@@ -27,7 +27,6 @@ export default function Sidebar() {
   const { state, isSimulated, startSimulation, resetSimulation } = useSimulation();
   const { theme, setTheme, isLight } = useTheme();
   const { isOpen, togglePanel } = useStory();
-  const { isOpen: isTrustEdgeOpen, togglePanel: toggleTrustEdge } = useTrustEdge();
   const [themeOpen, setThemeOpen] = useState(false);
 
   return (
@@ -145,26 +144,6 @@ export default function Sidebar() {
           <span>Story Mode</span>
           {isOpen && (
             <span className="ml-auto text-[10px] font-semibold" style={{ color: '#E5753C' }}>ON</span>
-          )}
-        </button>
-      </div>
-
-      {/* TrustEdge Toggle */}
-      <div className="px-3 pb-2">
-        <button
-          type="button"
-          onClick={toggleTrustEdge}
-          className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-xs transition-colors"
-          style={{
-            color: isTrustEdgeOpen ? '#fff' : 'var(--theme-text-muted)',
-            backgroundColor: isTrustEdgeOpen ? 'rgba(1, 116, 195, 0.2)' : 'transparent',
-            border: isTrustEdgeOpen ? '1px solid rgba(0, 180, 255, 0.25)' : '1px solid transparent',
-          }}
-        >
-          <Shield className="w-3.5 h-3.5" style={{ color: isTrustEdgeOpen ? '#00B4FF' : undefined }} />
-          <span>TrustEdge</span>
-          {isTrustEdgeOpen && (
-            <span className="ml-auto text-[10px] font-semibold" style={{ color: '#00B4FF' }}>ON</span>
           )}
         </button>
       </div>

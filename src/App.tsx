@@ -3,7 +3,6 @@ import { ThemeProvider } from './hooks/useTheme';
 import { SimulationProvider } from './hooks/useSimulation';
 import { DiscoveryProvider } from './hooks/useDiscovery';
 import { StoryProvider } from './hooks/useStory';
-import { TrustEdgeProvider } from './hooks/useTrustEdge';
 import AppShell from './components/layout/AppShell';
 import LandingPage from './pages/LandingPage';
 import ExecutiveDashboard from './pages/ExecutiveDashboard';
@@ -15,6 +14,7 @@ import MigrationPage from './pages/MigrationPage';
 import DiscoveryPage from './pages/DiscoveryPage';
 import BlueprintPage from './pages/BlueprintPage';
 import KernelModulePage from './pages/KernelModulePage';
+import TrustEdgePage from './pages/TrustEdgePage';
 
 export default function App() {
   return (
@@ -22,11 +22,11 @@ export default function App() {
       <ThemeProvider>
         <SimulationProvider>
           <DiscoveryProvider>
-            <TrustEdgeProvider>
             <StoryProvider>
               <Routes>
                 <Route element={<AppShell />}>
                   <Route index element={<LandingPage />} />
+                  <Route path="trustedge" element={<TrustEdgePage />} />
                   <Route path="kernel-module" element={<KernelModulePage />} />
                   <Route path="executive" element={<ExecutiveDashboard />} />
                   <Route path="discovery" element={<DiscoveryPage />} />
@@ -39,7 +39,6 @@ export default function App() {
                 </Route>
               </Routes>
             </StoryProvider>
-            </TrustEdgeProvider>
           </DiscoveryProvider>
         </SimulationProvider>
       </ThemeProvider>
